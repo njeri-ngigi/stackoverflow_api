@@ -19,7 +19,7 @@ class Question():
     def getSingleQuestion(cls, id):
         return ALL_QUESTIONS[id]
    
-class Users():
+class User():
     def __init__(self):
         self.user = {}
 
@@ -28,7 +28,7 @@ class Users():
 
     def addUser(self, name, username, email, password):
         if username in ALL_USERS:
-            return dict(message="User already exists. Try again.")
+            return dict(message="Username already exists. Try a different one.")
         self.user["name"] = name
         self.user["email"] = email
         pw_hash = generate_password_hash(password)
@@ -49,7 +49,7 @@ class Users():
     def postQuestion(self, title, content, username):
         newQuestion = Question(title, content, username)
         ALL_QUESTIONS.append(newQuestion)
-        return dict(newQuestion.title = newQuestion.content)
+        return dict(title = content)
 
     def deleteQuestion(self, id, username):
         if (id > len(ALL_QUESTIONS)):
@@ -59,8 +59,3 @@ class Users():
             return dict(message="Unauthorized to delete this question")
         ALL_QUESTIONS.pop(id)
         return dict(message="Question " + "#" + id + " Deleted Successfully")
-
-        
-
-
-
