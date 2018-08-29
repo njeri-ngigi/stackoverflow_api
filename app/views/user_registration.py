@@ -1,14 +1,14 @@
 from flask_restful import Resource
 from flask import request, jsonify
 
-from app.views.validate import Validate
-from app.models import User
+from validate import Validate
+from app import User
 
 class Signup(Resource):
     def post(self):
         data = request.get_json()
         if not data:
-            return dict(message="Fields cannot be empty")
+            return dict(message="Fields cannot be empty"), 400
         username = data.get("username")
         name = data.get("name")
         email = data.get("email")
@@ -26,4 +26,7 @@ class Signup(Resource):
             return result, 400
 
         my_user = User()
-        return my_user.addUser(name, username, email, password)
+        result = my_user.addUser(name, username, email, password)
+        if result["message"] == "Username already exists. Try a different one.":
+            return result, 409
+        return result, 201

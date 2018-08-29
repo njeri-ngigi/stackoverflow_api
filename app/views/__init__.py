@@ -1,1 +1,1 @@
-from app.views.user_registration import Signup
+from user_registration import Signup

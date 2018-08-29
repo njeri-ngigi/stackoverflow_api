@@ -5,7 +5,7 @@ from instance import app_config
 
 def createApp(config_name):
     '''function enclosing the Flask App'''
-    from app.views import Signup
+    from views import Signup
 
     app = Flask(__name__)
     api = Api(app)
