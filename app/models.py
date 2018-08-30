@@ -17,7 +17,9 @@ class Question():
 
     @classmethod
     def getSingleQuestion(cls, id):
-        return ALL_QUESTIONS[id]
+        if id >= len(ALL_QUESTIONS):
+            return dict(message="Question doesn't exist", error=404)
+        return dict(q=ALL_QUESTIONS[id])
    
 class User():
     def __init__(self):
@@ -45,18 +47,20 @@ class User():
             if result:
                 return dict(message="Welcome back, " + username + "!")
             return dict(message="Incorrect password", error=401)
-        return dict(message="Incorrect username", error=401)
+        return dict(message="Username doesn't exixt. Try Signing up.", error=401)
 
-    def postQuestion(self, title, content, username):
+    @classmethod
+    def postQuestion(cls, title, content, username):
         newQuestion = Question(title, content, username)
         ALL_QUESTIONS.append(newQuestion)
-        return dict(title = content)
+        return dict(title = title)
 
+    @classmethod
     def deleteQuestion(self, id, username):
-        if (id > len(ALL_QUESTIONS)):
-            return dict(message="Question doesn't exist")
+        if (id >= len(ALL_QUESTIONS)):
+            return dict(message="Question doesn't exist", error=404)
         u_question = ALL_QUESTIONS[id]
         if (u_question.username != username):
-            return dict(message="Unauthorized to delete this question")
+            return dict(message="Unauthorized to delete this question", error=401)
         ALL_QUESTIONS.pop(id)
-        return dict(message="Question " + "#" + id + " Deleted Successfully")
+        return dict(message="Question " + "#" + str(id) + " Deleted Successfully")

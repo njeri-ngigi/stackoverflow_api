@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from flask import request, jsonify
+from flask import request
 from flask_jwt_extended import (create_access_token, jwt_required,
                                 get_raw_jwt, get_jwt_claims, get_jwt_identity)
 from validate import Validate
@@ -58,3 +58,4 @@ class Logout(Resource):
         json_token_identifier = get_raw_jwt()['jti']
         BLACKLIST.add(json_token_identifier)
         return dict(message="Leaving so soon?"), 200
+        
