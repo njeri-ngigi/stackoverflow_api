@@ -36,17 +36,23 @@ class TestQuestions(unittest.TestCase):
 
     def test_get_questions(self):
         '''test getting all questions and single questions'''
-        #get all questions
+        #test get all questions
         result = self.client().get('/api/v1/questions')
         my_data = ast.literal_eval(result.data)
         self.assertGreater(len(my_data), 0)
         self.assertEqual(result.status_code, 200)
 
-        #get single question
-        # result2 = self.client().get('/api/v1/questions/0')
-        # my_data2 = ast.literal_eval(result2)
-        # self.assertIn("Git branching", my_data2)
-        # self.assertEqual(result2.status_code, 200)
+        #test get single question
+        result2 = self.client().get('/api/v1/questions/0')
+        my_data2 = ast.literal_eval(result2.data)
+        self.assertEqual("Git branching", my_data2["title"])
+        self.assertEqual(result2.status_code, 200)
+
+        #test missing question
+        result3 = self.client().get('/api/v1/questions/10')
+        my_data3 = ast.literal_eval(result3.data)
+        self.assertEqual("Question doesn't exist", my_data3["message"])
+        self.assertEqual(result3.status_code, 404)
 
     def test_delete_questions(self):
         '''test deleting questions'''
