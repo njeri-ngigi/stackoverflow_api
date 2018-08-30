@@ -33,7 +33,12 @@ class TestQuestions(unittest.TestCase):
 
     def test_questions(self):
         '''test handling posting questions'''
-
+        result = self.client().post('/api/v1/questions', headers=dict(Authorization="Bearer " + self.a_token), 
+                                    content_type="application/json", 
+                                    data=json.dumps({"title": "Baking a sponge cake", "content": "When baking a sponge cake how many eggs do you put in?"}))
+        my_data = ast.literal_eval(result.data)
+        self.assertEqual(result.status_code, 201)
+        self.assertEqual("Baking a sponge cake, Posted!", my_data["message"])
 
     def test_get_questions(self):
         '''test getting all questions and single questions'''
@@ -82,5 +87,3 @@ class TestQuestions(unittest.TestCase):
         my_data5 = ast.literal_eval(result5.data)
         self.assertEqual("Question doesn't exist", my_data5["message"])
         self.assertEqual(result5.status_code, 404)
-
-
