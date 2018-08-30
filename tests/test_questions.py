@@ -30,7 +30,6 @@ class TestQuestions(unittest.TestCase):
         self.client().post('/api/v1/questions', headers=dict(Authorization="Bearer " + self.a_token2), content_type="application/json", data=json.dumps({"title": "How to make a github page?", "content": "How do you host web templates on github using github pages"}))
         self.client().post('/api/v1/questions', headers=dict(Authorization="Bearer " + self.a_token2), content_type="application/json", data=json.dumps({"title": "Baby Shower", "content": "How to throw a greate baby shower"}))
         
-
     def test_questions(self):
         '''test handling posting questions'''
         result = self.client().post('/api/v1/questions', headers=dict(Authorization="Bearer " + self.a_token), 
