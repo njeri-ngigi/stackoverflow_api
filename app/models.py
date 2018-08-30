@@ -28,7 +28,7 @@ class User():
 
     def addUser(self, name, username, email, password):
         if username in ALL_USERS:
-            return dict(message="Username already exists. Try a different one.")
+            return dict(message="Username already exists. Try a different one.", error=409)
         self.user["name"] = name
         self.user["email"] = email
         pw_hash = generate_password_hash(password)
@@ -38,13 +38,14 @@ class User():
 
         return dict(message="Welcome " + username + "!")
     
-    def login(self, username, password):
+    @classmethod
+    def login(cls, username, password):
         if username in ALL_USERS:
             result = check_password_hash(ALL_USERS[username]["password"], password)
             if result:
-                return dict(message="Welcome back, " + username)
-            return dict(message="Incorrect password")
-        return dict(message="Incorrect username")
+                return dict(message="Welcome back, " + username + "!")
+            return dict(message="Incorrect password", error=401)
+        return dict(message="Incorrect username", error=401)
 
     def postQuestion(self, title, content, username):
         newQuestion = Question(title, content, username)

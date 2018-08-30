@@ -1,8 +1,11 @@
 from flask_restful import Resource
 from flask import request, jsonify
-
+from flask_jwt_extended import (create_access_token, jwt_required,
+                                get_raw_jwt, get_jwt_claims, get_jwt_identity)
 from validate import Validate
 from app import User
+
+BLACKLIST = set()
 
 class Signup(Resource):
     def post(self):
@@ -27,6 +30,31 @@ class Signup(Resource):
 
         my_user = User()
         result = my_user.addUser(name, username, email, password)
-        if result["message"] == "Username already exists. Try a different one.":
-            return result, 409
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
         return result, 201
+
+class Login(Resource):
+    def post(self):
+        data = request.get_json()
+        if not data:
+            return dict(message="Please enter username and password"), 400
+        username = data.get("username")
+        password = data.get("password")
+        
+        if not username or not password:
+            return dict(message="Username or password fields missing")
+
+        result = User.login(username, password)
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        access_token=create_access_token(identity=username)
+        return dict(result, token=access_token), 200
+
+class Logout(Resource):
+    '''Logout user by revoking the token given earlier'''
+    @jwt_required
+    def post(self):
+        json_token_identifier = get_raw_jwt()['jti']
+        BLACKLIST.add(json_token_identifier)
+        return dict(message="Leaving so soon?"), 200
