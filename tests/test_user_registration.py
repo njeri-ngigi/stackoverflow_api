@@ -95,4 +95,43 @@ class RegisterUserTestCase(unittest.TestCase):
         self.assertEqual(result6.status_code, 400)
         self.assertEqual("Passwords don't match", my_data6["message"])
 
+    def test_login_logout(self):
+        '''Test user login and logout'''
+        self.client().post('/api/v1/auth/signup', content_type="application/json", 
+                            data=json.dumps({"name": "Shalon", "username": "shanje", 
+                            "email": "njeri@to.com", "password": "Test123", "confirm_password": "Test123"}))
+        #test successful login
+        result = self.client().post('/api/v1/auth/login', content_type="application/json",
+                            data=json.dumps({"username": "shanje", "password":"Test123"}))
+        my_data = ast.literal_eval(result.data)
+        a_token = my_data["token"]
 
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual("Welcome back, shanje!", my_data["message"])
+        self.assertIn("token", my_data)
+        #test wrong username
+        result2 = self.client().post('/api/v1/auth/login', content_type="application/json",
+                            data=json.dumps({"username": "none", "password":"Test123"}))
+        my_data2 = ast.literal_eval(result2.data)
+
+        self.assertEqual(result2.status_code, 401)
+        self.assertEqual("Incorrect username", my_data2["message"])
+        #test wrong password
+        result3 = self.client().post('/api/v1/auth/login', content_type="application/json",
+                            data=json.dumps({"username": "shanje", "password":"Testing"}))
+        my_data3 = ast.literal_eval(result3.data)
+
+        self.assertEqual(result3.status_code, 401)
+        self.assertEqual("Incorrect password", my_data3["message"])
+        #test logout
+        result4 = self.client().post('/api/v1/auth/logout', headers=dict(Authorization="Bearer " + a_token))
+        result5 = self.client().post('/api/v1/auth/logout', headers=dict(Authorization="Bearer " + a_token))
+        
+        my_data4 = ast.literal_eval(result4.data)
+        my_data5 = ast.literal_eval(result5.data)
+
+        self.assertEqual(result4.status_code, 200)
+        self.assertEqual(result5.status_code, 401)
+       
+        self.assertEqual("Leaving so soon?", my_data4["message"])
+        self.assertEqual("Token has been revoked", my_data5["msg"])
