@@ -115,7 +115,7 @@ class RegisterUserTestCase(unittest.TestCase):
         my_data2 = ast.literal_eval(result2.data)
 
         self.assertEqual(result2.status_code, 401)
-        self.assertEqual("Incorrect username", my_data2["message"])
+        self.assertEqual("Username doesn't exixt. Try Signing up.", my_data2["message"])
         #test wrong password
         result3 = self.client().post('/api/v1/auth/login', content_type="application/json",
                             data=json.dumps({"username": "shanje", "password":"Testing"}))
