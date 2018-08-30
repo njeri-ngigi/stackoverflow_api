@@ -7,7 +7,7 @@ from instance import app_config
 def createApp(config_name):
     '''function enclosing the Flask App'''
     from views import (Signup, Login, Logout, BLACKLIST,
-                        Questions, QuestionsQuestionId)
+                        Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId)
 
     app = Flask(__name__)
     api = Api(app)
@@ -32,4 +32,6 @@ def createApp(config_name):
     api.add_resource(Logout, '/api/v1/auth/logout')
     api.add_resource(Questions, '/api/v1/questions')
     api.add_resource(QuestionsQuestionId, '/api/v1/questions/<question_id>')
+    api.add_resource(QuestionsAnswers, '/api/v1/questions/<question_id>/answers')
+    api.add_resource(QuestionsAnswersId, '/api/v1/questions/<question_id>/answers/<answer_id>')
     return app
