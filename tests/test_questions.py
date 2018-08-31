@@ -83,7 +83,7 @@ class TestQuestions(unittest.TestCase):
         current_length = len(my_data)
 
         result2 = self.client().delete('/api/v1/questions/2',
-                                       headers=dict(Authorization="Bearer " + self.a_token2))
+                                       headers=dict(Authorization="Bearer " + self.a_token))
         my_data2 = ast.literal_eval(result2.data)
         self.assertEqual("Question #2 Deleted Successfully", my_data2["message"])
         self.assertEqual(result2.status_code, 200)
