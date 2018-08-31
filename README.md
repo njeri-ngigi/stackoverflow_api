@@ -1,2 +1,2 @@
 # stackoverflow_api
-stackoverflow-like api
+stackoverflow-lite api
