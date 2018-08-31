@@ -80,7 +80,7 @@ class User():
     @classmethod
     def deleteQuestion(cls, question_id, username):
         '''Delete question'''
-        if id >= len(ALL_QUESTIONS):
+        if question_id >= len(ALL_QUESTIONS):
             return dict(message="Question doesn't exist", error=404)
         u_question = ALL_QUESTIONS[question_id]
         if u_question.username != username:
