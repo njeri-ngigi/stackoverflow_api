@@ -3,6 +3,7 @@ import re
 special_character_regex = r'[0-9~!@#$%^&*()_-`{};:\'"\|/?.>,<]'
 
 class Validate():
+    '''Helper class for input validation'''
     def validate_email(self, email):
         '''validating email format'''
         match = re.match(
@@ -22,7 +23,7 @@ class Validate():
         if confirm_password != password:
             return {"message": "Passwords don't match"}
         return password
-    
+
     def validate_name(self, name):
         '''method to check for special characters in name'''
         if bool(re.search(special_character_regex, name)) is True:
@@ -45,6 +46,5 @@ class Validate():
             return email
         if "message" in password:
             return password
-        
         return {"username":username, "name":name, "password":password, "email":email}
         

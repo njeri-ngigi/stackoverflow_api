@@ -1,6 +1,6 @@
 '''app/models.py'''
-from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
+from werkzeug.security import generate_password_hash, check_password_hash
 
 ALL_USERS = {}
 ALL_QUESTIONS = []
@@ -22,13 +22,12 @@ class Question():
         return ALL_QUESTIONS
 
     @classmethod
-    def getSingleQuestion(cls, id):
+    def getSingleQuestion(cls, question_id):
         '''get single question'''
-        if id >= len(ALL_QUESTIONS):
+        if question_id >= len(ALL_QUESTIONS):
             return dict(message="Question doesn't exist", error=404)
-        return dict(q=ALL_QUESTIONS[id])
+        return dict(q=ALL_QUESTIONS[question_id])
 
-   
 class User():
     '''User class model'''
     def __init__(self):
@@ -51,7 +50,7 @@ class User():
         ALL_USERS[username] = self.user
 
         return dict(message="Welcome " + username + "!")
-    
+
     @classmethod
     def login(cls, username, password):
         '''login user'''
@@ -67,7 +66,7 @@ class User():
         '''Post question'''
         newQuestion = Question(title, content, username)
         ALL_QUESTIONS.append(newQuestion)
-        return dict(title = title)
+        return dict(title=title)
 
     @classmethod
     def postAnswer(cls, question_id, username, content):
@@ -79,23 +78,23 @@ class User():
         return dict(message="Answer Posted!")
 
     @classmethod
-    def deleteQuestion(self, id, username):
+    def deleteQuestion(cls, question_id, username):
         '''Delete question'''
-        if (id >= len(ALL_QUESTIONS)):
+        if id >= len(ALL_QUESTIONS):
             return dict(message="Question doesn't exist", error=404)
-        u_question = ALL_QUESTIONS[id]
-        if (u_question.username != username):
+        u_question = ALL_QUESTIONS[question_id]
+        if u_question.username != username:
             return dict(message="Unauthorized to delete this question", error=401)
-        ALL_QUESTIONS.pop(id)
-        return dict(message="Question " + "#" + str(id) + " Deleted Successfully")
+        ALL_QUESTIONS.pop(question_id)
+        return dict(message="Question " + "#" + str(question_id) + " Deleted Successfully")
 
     @classmethod
-    def updateAnswer(self, question_id, answer_id, username, content):
+    def updateAnswer(cls, question_id, answer_id, username, content):
         '''Update answer'''
-        if (question_id >= len(ALL_QUESTIONS)):
+        if question_id >= len(ALL_QUESTIONS):
             return dict(message="Question doesn't exist", error=404)
         question = ALL_QUESTIONS[question_id]
-        if (answer_id >= len(question.answers)):
+        if answer_id >= len(question.answers):
             return dict(message="This answer doesn't exist", error=404)
         answer = question.answers[answer_id]
         if username not in answer:
@@ -104,18 +103,14 @@ class User():
         return dict(message="Answer updated!")
 
     @classmethod
-    def acceptAnswer(self, question_id, answer_id, username):
+    def acceptAnswer(cls, question_id, answer_id, username):
         '''Accept answer'''
-        if (question_id >= len(ALL_QUESTIONS)):
+        if question_id >= len(ALL_QUESTIONS):
             return dict(message="Question doesn't exist", error=404)
         question = ALL_QUESTIONS[question_id]
         if username != question.username:
             return dict(message="Unauthorized to accept answer", error=401)
-        if (answer_id >= len(question.answers)):
+        if answer_id >= len(question.answers):
             return dict(message="This answer doesn't exist", error=404)
         question.answer_accepted = answer_id
-        return dict(message="Answer #" + str(answer_id) + " accepted!")      
-        
-
-
-    
+        return dict(message="Answer #" + str(answer_id) + " accepted!")

@@ -8,7 +8,7 @@ from instance import app_config
 def createApp(config_name):
     '''function enclosing the Flask App'''
     from views import (Signup, Login, Logout, BLACKLIST,
-                        Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId)
+                       Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId)
 
     app = Flask(__name__)
     api = Api(app)
