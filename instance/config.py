@@ -1,3 +1,4 @@
+'''instance/config.py'''
 class Config(object):
     '''parent config file'''
     DEBUG = True

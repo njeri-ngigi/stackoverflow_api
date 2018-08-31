@@ -1,9 +1,11 @@
+'''tests/test_questions.py'''
 import unittest
 import json
 import ast
 from app import createApp
 
 class TestQuestions(unittest.TestCase):
+    '''Class testing questions'''
     def setUp(self):
         self.app = createApp(config_name="testing")
         self.client = self.app.test_client

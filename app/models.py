@@ -1,3 +1,4 @@
+'''app/models.py'''
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
 
@@ -5,7 +6,9 @@ ALL_USERS = {}
 ALL_QUESTIONS = []
 
 class Question():
+    '''Question class model'''
     def __init__(self, u_title, u_content, u_username):
+        '''set up class variables'''
         self.title = u_title
         self.content = u_content
         self.timestamp = date.today
@@ -15,23 +18,29 @@ class Question():
 
     @classmethod
     def getAllQuestions(cls):
+        '''get all questions'''
         return ALL_QUESTIONS
 
     @classmethod
     def getSingleQuestion(cls, id):
+        '''get single question'''
         if id >= len(ALL_QUESTIONS):
             return dict(message="Question doesn't exist", error=404)
         return dict(q=ALL_QUESTIONS[id])
 
    
 class User():
+    '''User class model'''
     def __init__(self):
+        '''set up class variables'''
         self.user = {}
 
     def getAllUsers(self):
+        '''get all users'''
         return ALL_USERS
 
     def addUser(self, name, username, email, password):
+        '''Add a user'''
         if username in ALL_USERS:
             return dict(message="Username already exists. Try a different one.", error=409)
         self.user["name"] = name
@@ -45,6 +54,7 @@ class User():
     
     @classmethod
     def login(cls, username, password):
+        '''login user'''
         if username in ALL_USERS:
             result = check_password_hash(ALL_USERS[username]["password"], password)
             if result:
@@ -54,12 +64,14 @@ class User():
 
     @classmethod
     def postQuestion(cls, title, content, username):
+        '''Post question'''
         newQuestion = Question(title, content, username)
         ALL_QUESTIONS.append(newQuestion)
         return dict(title = title)
 
     @classmethod
     def postAnswer(cls, question_id, username, content):
+        '''Post answer'''
         if question_id >= len(ALL_QUESTIONS):
             return dict(message="Question doesn't exist", error=404)
         question = ALL_QUESTIONS[question_id]
@@ -68,6 +80,7 @@ class User():
 
     @classmethod
     def deleteQuestion(self, id, username):
+        '''Delete question'''
         if (id >= len(ALL_QUESTIONS)):
             return dict(message="Question doesn't exist", error=404)
         u_question = ALL_QUESTIONS[id]
@@ -78,6 +91,7 @@ class User():
 
     @classmethod
     def updateAnswer(self, question_id, answer_id, username, content):
+        '''Update answer'''
         if (question_id >= len(ALL_QUESTIONS)):
             return dict(message="Question doesn't exist", error=404)
         question = ALL_QUESTIONS[question_id]
@@ -91,6 +105,7 @@ class User():
 
     @classmethod
     def acceptAnswer(self, question_id, answer_id, username):
+        '''Accept answer'''
         if (question_id >= len(ALL_QUESTIONS)):
             return dict(message="Question doesn't exist", error=404)
         question = ALL_QUESTIONS[question_id]

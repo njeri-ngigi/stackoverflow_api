@@ -1,3 +1,4 @@
+'''views/questions.py'''
 from flask_restful import Resource
 from flask import request, jsonify
 from flask_jwt_extended import (jwt_required, get_raw_jwt, get_jwt_identity)
@@ -6,7 +7,9 @@ import ast
 from app import User, Question
 
 class Questions(Resource):
+    '''class representing retrieving all questions and posting questing endpoint'''
     def get(self):
+        '''get method'''
         result = Question.getAllQuestions()
         if len(result) == 0:
             return result, 200
@@ -18,6 +21,7 @@ class Questions(Resource):
 
     @jwt_required
     def post(self):
+        '''post method'''
         data = request.get_json()
         if not data:
             return dict(message="Fields cannot be empty"), 400
@@ -34,7 +38,9 @@ class Questions(Resource):
 
 
 class QuestionsQuestionId(Resource):
+    '''Class respresenting activities for a single question'''
     def get(self, question_id):
+        '''get single question'''
         q_id = ast.literal_eval(question_id)
         u_question = Question.getSingleQuestion(q_id)
         
@@ -47,6 +53,7 @@ class QuestionsQuestionId(Resource):
 
     @jwt_required
     def delete(self, question_id):
+        '''delete single question'''
         username = get_jwt_identity()
         q_id = ast.literal_eval(question_id)
         result = User.deleteQuestion(q_id, username)
@@ -55,8 +62,10 @@ class QuestionsQuestionId(Resource):
         return result, 200
 
 class QuestionsAnswers(Resource):
+    '''Class representing posting an answer endpoint'''
     @jwt_required
     def post(self, question_id):
+        '''post answer method'''
         data = request.get_json()
         if not data:
             return dict(message="Field(s) cannot be empty")
@@ -71,13 +80,16 @@ class QuestionsAnswers(Resource):
         return result, 201
 
 class QuestionsAnswersId(Resource):
+    '''class representing activities for a question's answers'''
     @jwt_required
     def put(self, question_id, answer_id):
+        '''put method'''
         data = request.get_json()
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
         username = get_jwt_identity()
-            
+
+        #Update an answer  
         if data: 
             content = data.get("content")
             if not content:
@@ -87,7 +99,8 @@ class QuestionsAnswersId(Resource):
             if "error" in result:
                 return dict(message=result["message"]), result["error"]
             return result, 200
-
+        
+        #Accept an answer
         result2 = User.acceptAnswer(q_id, a_id, username)
         if "error" in result2:
             return dict(message=result2["message"]), result2["error"]

@@ -1,9 +1,11 @@
+'''tests/test_user_registration.py'''
 import unittest
 import json
 import ast
 from app import createApp
 
 class RegisterUserTestCase(unittest.TestCase):
+    '''Class testing user registration, login and logout'''
     def setUp(self):
         self.app = createApp(config_name="testing")
         self.client = self.app.test_client

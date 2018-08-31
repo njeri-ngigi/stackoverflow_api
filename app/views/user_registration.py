@@ -1,3 +1,4 @@
+'''views/user_registration.py'''
 from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import (create_access_token, jwt_required,
@@ -8,7 +9,9 @@ from app import User
 BLACKLIST = set()
 
 class Signup(Resource):
+    '''Class representing user registration'''
     def post(self):
+        '''post (signup method)'''
         data = request.get_json()
         if not data:
             return dict(message="Fields cannot be empty"), 400
@@ -35,7 +38,9 @@ class Signup(Resource):
         return result, 201
 
 class Login(Resource):
+    '''Class representing user login'''
     def post(self):
+        '''post (login) method'''
         data = request.get_json()
         if not data:
             return dict(message="Please enter username and password"), 400
@@ -52,9 +57,10 @@ class Login(Resource):
         return dict(result, token=access_token), 200
 
 class Logout(Resource):
-    '''Logout user by revoking the token given earlier'''
+    ''' Class representing Logout user by revoking the token given earlier'''
     @jwt_required
     def post(self):
+        '''post (logout) method'''
         json_token_identifier = get_raw_jwt()['jti']
         BLACKLIST.add(json_token_identifier)
         return dict(message="Leaving so soon?"), 200

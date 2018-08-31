@@ -1,4 +1,4 @@
-'''validate.py'''
+'''views/validate.py'''
 import re
 special_character_regex = r'[0-9~!@#$%^&*()_-`{};:\'"\|/?.>,<]'
 

@@ -1,3 +1,4 @@
+'''app/application.py'''
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
@@ -23,10 +24,11 @@ def createApp(config_name):
 
     @jwt.token_in_blacklist_loader
     def check_if_token_blacklist(decrypted_token):
-        '''check if jti(unique identifier) is in black list'''
+        '''check if jti(unique identifier) is in BLACKLIST'''
         json_token_identifier = decrypted_token['jti']
         return json_token_identifier in BLACKLIST
 
+    #Add resources to routes
     api.add_resource(Signup, '/api/v1/auth/signup')
     api.add_resource(Login, '/api/v1/auth/login')
     api.add_resource(Logout, '/api/v1/auth/logout')
