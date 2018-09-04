@@ -10,7 +10,7 @@ coverage==4.5.1
 dnspython==1.15.0
 email-validator==1.0.2
 enum34==1.1.6
-Flask==0.12.2
+Flask==0.12.3
 Flask-API==1.0
 Flask-JWT==0.3.2
 Flask-JWT-Extended==3.7.2
