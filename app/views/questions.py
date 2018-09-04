@@ -9,7 +9,7 @@ from app import User, Question
 class Questions(Resource):
     '''class representing retrieving all questions and posting questing endpoint'''
     def get(self):
-        '''get method'''
+        '''get all questions'''
         result = Question.getAllQuestions()
         if len(result) == 0:
             return result, 200
@@ -22,7 +22,7 @@ class Questions(Resource):
 
     @jwt_required
     def post(self):
-        '''post method'''
+        '''post a question'''
         data = request.get_json()
         if not data:
             return dict(message="Fields cannot be empty"), 400
@@ -61,7 +61,7 @@ class QuestionsAnswers(Resource):
     '''Class representing posting an answer endpoint'''
     @jwt_required
     def post(self, question_id):
-        '''post answer method'''
+        '''post answer'''
         data = request.get_json()
         if not data:
             return dict(message="Field(s) cannot be empty")
