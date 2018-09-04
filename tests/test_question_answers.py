@@ -48,7 +48,7 @@ class TestQuestionAnswers(unittest.TestCase):
         result = self.client().post('/api/v1/questions/0/answers',
                                     headers=dict(Authorization="Bearer " + self.a_token2),
                                     content_type="application/json",
-                                    data=json.dumps({"content": "Use git branch <branch_name>. The checkout the branch using git checkout <branch_name>"}))
+                                    data=json.dumps({"content": "Use git branch <branch_name>"}))
         my_data = ast.literal_eval(result.data)
         self.assertEqual(result.status_code, 201)
         self.assertEqual("Answer Posted!", my_data["message"])
@@ -57,7 +57,7 @@ class TestQuestionAnswers(unittest.TestCase):
         result2 = self.client().post('/api/v1/questions/20/answers',
                                      headers=dict(Authorization="Bearer " + self.a_token2),
                                      content_type="application/json",
-                                     data=json.dumps({"content": "Use git branch <branch_name>. The checkout the branch using git checkout <branch_name>"}))
+                                     data=json.dumps({"content": "Use git branch <branch_name>"}))
         my_data2 = ast.literal_eval(result2.data)
         self.assertEqual(result2.status_code, 404)
         self.assertEqual("Question doesn't exist", my_data2["message"])
