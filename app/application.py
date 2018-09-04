@@ -5,10 +5,10 @@ from flask_jwt_extended import JWTManager
 
 from instance import app_config
 
-def createApp(config_name):
+def create_app(config_name):
     '''function enclosing the Flask App'''
-    from views import (Signup, Login, Logout, BLACKLIST,
-                       Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId)
+    from app.views import (Signup, Login, Logout, BLACKLIST,
+                           Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId)
 
     app = Flask(__name__)
     api = Api(app)
@@ -23,7 +23,7 @@ def createApp(config_name):
     jwt = JWTManager(app)
 
     @jwt.token_in_blacklist_loader
-    def check_if_token_blacklist(decrypted_token):
+    def _check_if_token_blacklist(decrypted_token):
         '''check if jti(unique identifier) is in BLACKLIST'''
         json_token_identifier = decrypted_token['jti']
         return json_token_identifier in BLACKLIST

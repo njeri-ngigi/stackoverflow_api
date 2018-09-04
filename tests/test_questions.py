@@ -2,12 +2,12 @@
 import unittest
 import json
 import ast
-from app import createApp
+from app.application import create_app
 
 class TestQuestions(unittest.TestCase):
     '''Class testing questions'''
     def setUp(self):
-        self.app = createApp(config_name="testing")
+        self.app = create_app(config_name="testing")
         self.client = self.app.test_client
 
         #register 2 users
@@ -33,12 +33,13 @@ class TestQuestions(unittest.TestCase):
         self.client().post('/api/v1/questions',
                            headers=dict(Authorization="Bearer " + self.a_token),
                            content_type="application/json",
-                           data=json.dumps({"title": "Git branching", "content": "How to create and checkout a branch in git"}))
+                           data=json.dumps({"title": "Git branching",
+                                            "content": "How to create, checkout a branch in git"}))
         self.client().post('/api/v1/questions',
                            headers=dict(Authorization="Bearer " + self.a_token2),
                            content_type="application/json",
                            data=json.dumps({"title": "How to make a github page?",
-                                            "content": "How do you host web templates on github using github pages"}))
+                                            "content": "How to host html using github pages"}))
         self.client().post('/api/v1/questions',
                            headers=dict(Authorization="Bearer " + self.a_token2),
                            content_type="application/json",
@@ -50,7 +51,7 @@ class TestQuestions(unittest.TestCase):
                                     headers=dict(Authorization="Bearer " + self.a_token),
                                     content_type="application/json",
                                     data=json.dumps({"title": "Baking a sponge cake",
-                                                     "content": "When baking a sponge cake how many eggs do you put in?"}))
+                                                     "content": "How many eggs to put in cake"}))
         my_data = ast.literal_eval(result.data)
         self.assertEqual(result.status_code, 201)
         self.assertEqual("Baking a sponge cake, Posted!", my_data["message"])
