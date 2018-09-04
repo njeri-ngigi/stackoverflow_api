@@ -2,12 +2,12 @@
 import unittest
 import json
 import ast
-from app import createApp
+from app import create_app
 
 class TestQuestionAnswers(unittest.TestCase):
     '''Class Testing Question Answers'''
     def setUp(self):
-        self.app = createApp(config_name="testing")
+        self.app = create_app(config_name="testing")
         self.client = self.app.test_client
 
         #signup 2 users

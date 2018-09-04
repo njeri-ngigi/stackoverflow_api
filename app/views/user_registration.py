@@ -31,7 +31,7 @@ class Signup(Resource):
             return result, 400
 
         my_user = User()
-        result = my_user.addUser(name, username, email, password)
+        result = my_user.add_user(name, username, email, password)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 201
