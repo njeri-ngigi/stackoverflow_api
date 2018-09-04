@@ -2,7 +2,7 @@
 import unittest
 import json
 import ast
-from app import create_app
+from app.application import create_app
 
 class TestQuestions(unittest.TestCase):
     '''Class testing questions'''

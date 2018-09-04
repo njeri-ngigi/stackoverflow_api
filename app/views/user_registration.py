@@ -3,7 +3,7 @@ from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import (create_access_token, jwt_required, get_raw_jwt)
 from app.views.validate import Validate
-from app import User
+from app.models import User
 
 BLACKLIST = set()
 

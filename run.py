@@ -1,6 +1,6 @@
 '''./run.py'''
 from flask import jsonify, render_template
-from app import create_app
+from app.application import create_app
 
 CONFIG_NAME = "development"
 app = create_app(CONFIG_NAME)
