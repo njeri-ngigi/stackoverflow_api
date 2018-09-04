@@ -47,6 +47,10 @@ The api provides endpoints for signup, login, logout, retrieve all or a single q
 ## Documentation
 [Go to Stackoverflow-Lite Documentation on apiary.io](https://stackoverflowlite17.docs.apiary.io/#)
 
+## Hosting
+The app is hosted on heroku<br>
+[Go to Stackoverflow-lite](https://my-stackoverflow-lite-api.herokuapp.com/)
+
 ## Built with 
    Flask, a python framework
    
