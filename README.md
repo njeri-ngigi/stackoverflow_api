@@ -39,8 +39,11 @@ The api provides endpoints for signup, login, logout, retrieve all or a single q
       
    ```
    $nosetests tests/
-  ```
-
+   ```
+  To show coverage:
+   ```
+   $nosetests tests/ --with-coverage
+   ```
 
 ## Built with 
    Flask, a python framework
