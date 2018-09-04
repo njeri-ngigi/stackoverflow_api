@@ -25,7 +25,7 @@ def server_error(error):
     '''Internal server error'''
     return jsonify(dict(error='Internal server error')), 500
 
-@app.route('/api/v1/documentation')
+@app.route('/')
 def home():
     '''method to render documentation'''
     return render_template('documentation.html'), 200
