@@ -2,12 +2,12 @@
 import unittest
 import json
 import ast
-from app import createApp
+from app.application import create_app
 
 class RegisterUserTestCase(unittest.TestCase):
     '''Class testing user registration, login and logout'''
     def setUp(self):
-        self.app = createApp(config_name="testing")
+        self.app = create_app(config_name="testing")
         self.client = self.app.test_client
 
     def test_register_user(self):
@@ -16,7 +16,7 @@ class RegisterUserTestCase(unittest.TestCase):
         result = self.client().post('/api/v1/auth/signup',
                                     content_type="application/json",
                                     data=json.dumps({"name": "Njeri", "username": "nje_ry",
-                                                     "email": "njeri@to.com", "password": "Test123",
+                                                     "email": "njeri@to.cm", "password": "Test123",
                                                      "confirm_password": "Test123"}))
         my_data = ast.literal_eval(result.data)
         self.assertEqual(result.status_code, 201)
@@ -25,7 +25,7 @@ class RegisterUserTestCase(unittest.TestCase):
         result2 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
                                      data=json.dumps({"name": "Njeri", "username": "njery",
-                                                      "email": "njeri@to.com", "password": "Test123",
+                                                      "email": "njeri@to.cm", "password": "Test123",
                                                       "confirm_password": "Test123"}))
         my_data2 = ast.literal_eval(result2.data)
         self.assertEqual(result2.status_code, 409)
@@ -43,7 +43,8 @@ class RegisterUserTestCase(unittest.TestCase):
                                      data=json.dumps({"name": "Njeri", "username": "njery"}))
         my_data4 = ast.literal_eval(result4.data)
         self.assertEqual(result4.status_code, 400)
-        self.assertEqual("name, username, email, password or confirm_password fields missing", my_data4["message"])
+        self.assertEqual("name, username, email, password or confirm_password fields missing",
+                         my_data4["message"])
 
     def test_validate_data(self):
         '''Test validating user input'''
@@ -51,7 +52,7 @@ class RegisterUserTestCase(unittest.TestCase):
         result = self.client().post('/api/v1/auth/signup',
                                     content_type="application/json",
                                     data=json.dumps({"name": "Njeri@#", "username": "njery",
-                                                     "email": "njeri@to.com", "password": "Test123",
+                                                     "email": "njeri@to.cm", "password": "Test123",
                                                      "confirm_password": "Test123"}))
         my_data = ast.literal_eval(result.data)
         self.assertEqual(result.status_code, 400)
@@ -69,7 +70,7 @@ class RegisterUserTestCase(unittest.TestCase):
         result3 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
                                      data=json.dumps({"name": "Njeri", "username": "njery",
-                                                      "email": "njeri@to.com", "password": "123",
+                                                      "email": "njeri@to.cm", "password": "123",
                                                       "confirm_password": "123"}))
         my_data3 = ast.literal_eval(result3.data)
         self.assertEqual(result3.status_code, 400)
@@ -78,25 +79,27 @@ class RegisterUserTestCase(unittest.TestCase):
         result4 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
                                      data=json.dumps({"name": "Njeri", "username": "njery",
-                                                      "email": "njeri@to.com", "password": "123456",
+                                                      "email": "njeri@to.cm", "password": "123456",
                                                       "confirm_password": "123456"}))
         my_data4 = ast.literal_eval(result4.data)
         self.assertEqual(result4.status_code, 400)
-        self.assertEqual("password must contain a mix of upper and lowercase letters", my_data4["message"])
+        self.assertEqual("password must contain a mix of upper and lowercase letters",
+                         my_data4["message"])
         #test weak password
         result5 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
                                      data=json.dumps({"name": "Njeri", "username": "njery",
-                                                      "email": "njeri@to.com", "password": "Testing",
+                                                      "email": "njeri@to.cm", "password": "Testing",
                                                       "confirm_password": "Testing"}))
         my_data5 = ast.literal_eval(result5.data)
         self.assertEqual(result5.status_code, 400)
-        self.assertEqual("password must contain atleast one numeric or special character", my_data5["message"])
+        self.assertEqual("password must contain atleast one numeric or special character",
+                         my_data5["message"])
         #test unmatching passwords
         result6 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
                                      data=json.dumps({"name": "Njeri", "username": "njery",
-                                                      "email": "njeri@to.com", "password": "Test123",
+                                                      "email": "njeri@to.cm", "password": "Test123",
                                                       "confirm_password": "Test13"}))
         my_data6 = ast.literal_eval(result6.data)
         self.assertEqual(result6.status_code, 400)
@@ -107,7 +110,7 @@ class RegisterUserTestCase(unittest.TestCase):
         self.client().post('/api/v1/auth/signup',
                            content_type="application/json",
                            data=json.dumps({"name": "Shalon", "username": "shanje",
-                                            "email": "njeri@to.com", "password": "Test123",
+                                            "email": "njeri@to.cm", "password": "Test123",
                                             "confirm_password": "Test123"}))
         #test successful login
         result = self.client().post('/api/v1/auth/login',

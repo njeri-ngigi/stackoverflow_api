@@ -2,14 +2,15 @@
 from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import (create_access_token, jwt_required, get_raw_jwt)
-from validate import Validate
-from app import User
+from app.views.validate import Validate
+from app.models import User
 
 BLACKLIST = set()
 
 class Signup(Resource):
     '''Class representing user registration'''
-    def post(self):
+    @classmethod
+    def post(cls):
         '''post (signup method)'''
         data = request.get_json()
         if not data:
@@ -21,7 +22,8 @@ class Signup(Resource):
         confirm_password = data.get("confirm_password")
 
         if not username or not name or not email or not password or not confirm_password:
-            return dict(message="name, username, email, password or confirm_password fields missing"), 400
+            return dict(
+                message="name, username, email, password or confirm_password fields missing"), 400
         u_valid = Validate()
         result = u_valid.validate_register(username, name, email, password, confirm_password)
 
@@ -29,14 +31,15 @@ class Signup(Resource):
             return result, 400
 
         my_user = User()
-        result = my_user.addUser(name, username, email, password)
+        result = my_user.add_user(name, username, email, password)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 201
 
 class Login(Resource):
     '''Class representing user login'''
-    def post(self):
+    @classmethod
+    def post(cls):
         '''post (login) method'''
         data = request.get_json()
         if not data:
@@ -53,8 +56,9 @@ class Login(Resource):
 
 class Logout(Resource):
     ''' Class representing Logout user by revoking the token given earlier'''
+    @classmethod
     @jwt_required
-    def post(self):
+    def post(cls):
         '''post (logout) method'''
         json_token_identifier = get_raw_jwt()['jti']
         BLACKLIST.add(json_token_identifier)
