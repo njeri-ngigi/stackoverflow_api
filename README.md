@@ -44,6 +44,8 @@ The api provides endpoints for signup, login, logout, retrieve all or a single q
    ```
    $nosetests tests/ --with-coverage
    ```
+## Documentation
+[Go to Stackoverflow-Lite Documentation on apiary.io](https://stackoverflowlite17.docs.apiary.io/#)
 
 ## Built with 
    Flask, a python framework
