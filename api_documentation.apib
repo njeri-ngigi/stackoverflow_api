@@ -1,0 +1,208 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# Stackoverflow-Lite
+
+StackOverflow-Lite is an app that allows a user to post questions, 
+answer other questions posted on the forum. 
+Users can accept answers to their questions and view various statistics involved 
+such as the number of questions asked or answered.
+The api provides endpoints for signup, login, logout, retrieve all or 
+a single question, post a question, answer a question and 
+update an answer or accept an answer.
+
+## Register User [/api/v1/auth/signup]
+A user may signup using this action. 
+It takes a JSON object containing user information.
+### Add a new user [POST]
+
++ Request (application/json)
+
+    + Body
+    
+            {
+                "name":"Jay", "username":"jay", "email":"jay@abc.com",
+                "password":"Hello123", "confirm password":"Hello123"
+            }
+
++ Response 201 (application/json)
+
+    + Body
+
+            {
+                "message":"Welcome jay!"
+            }
+
+
+## User Login [/api/v1/auth/login]
+User may login by providing username and password.
+### Login user [POST]
+
++ Request (application/json)
+
+    + Body
+    
+            {
+                "username":"jay", "password":"Hello123"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "message" : "Welcome back, jay!"
+                "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            }
+
+## User Logout [/api/v1/auth/logout]
+A user needs to be logged in to access this action using the token provided during login.
+### Logout user [POST]
+
++ Request (application/json)
+
+    + Headers
+    
+                Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "message" : "Leaving so soon?"
+            }
+            
+## Questions Collection [/api/v1/questions]
+
+### List All Questions [GET]
+Retreive all questions
+
++ Response 200 (application/json)
+
+        [
+            {
+                "accepted_answer": "none",
+                "answers": [
+                    {
+                        "papi": "Open a shop on shopify"
+                    }
+                ],
+                "content": "Hello, I would like to know how to sell fruits",
+                "title": "How to sell?",
+                "username": "jay"
+            },
+            {
+                "accepted_answer": "none",
+                "answers": [],
+                "content": "Whats the price on they new J's",
+                "title": "Addidas shoes",
+                "username": "larry"
+            },
+            {
+                "accepted_answer": "none",
+                "answers": [],
+                "content": "How long is the seinfield series?",
+                "title": "Seinfield series",
+                "username": "shuri"
+            }
+        ]
+
+### Create a New Question [POST]
+
+This Action requires a user to be logged in. The user may post their own question using this action. It takes a JSON
+object containing the question title and question content
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
+                
+    + Body
+    
+            {
+                "title" : "How to sell?", 
+                "content" : "Hello, I would like to know how to sell fruits"
+            }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /api/v1/questions/0
+
+    + Body
+
+            {
+                "message": "How to sell?, Posted!"
+            }
+        
+## Single Question Actions [/api/v1/questions/<question_id>]
+### List Single Questions [GET]
+Retreive single question using question id.
+
++ Response 200 (application/json)
+
+        {
+            "accepted_answer": "none",
+            "answers": [
+                {
+                    "njery": "Fly to Miami"
+                }
+            ],
+            "content": "Hello, I would like to know how to sell fruits",
+            "title": "How to sell?",
+            "username": "njery"
+        }
+
+### Delete Question [DELETE]
+This Action requires a user to be logged in. They can delete their question using question id.
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
+                
++ Response 200 (application/json)
+
+        {
+            "message": "Question #<question_id> Deleted Successfully"
+        }
+        
+## Answers [/api/v1/questions/<question_id>/answers]
+### Post Answer [POST]
+This Action requires a user to be logged in. They can post an answer to a question.
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
+                
++ Response 200 (application/json)
+
+            {
+                "message": "Answer Posted!"
+            }
+
+## Accept or Update Answer [/api/v1/questions/<question_id>/answers/<answer_id>]
+### Accept or Update Answer [POST]
+This Action requires a user to be logged in. If the user is the owner of the question they can accept an answer using this action. If the user is the owner of the answer they can update their answer using this action
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
+                
++ Response 200 (application/json)
+            
+        { 
+        "message": "Answer #<answer_id> accepted!" 
+        }
+
+
