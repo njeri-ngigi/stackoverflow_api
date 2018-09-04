@@ -26,6 +26,10 @@ The api provides endpoints for signup, login, logout, retrieve all or a single q
    ```
    $pip install -r requirements.txt
    ```
+   To run the application:
+   ```
+   $python run.py
+   ```
       
 
 ## Running the tests
@@ -34,8 +38,10 @@ The api provides endpoints for signup, login, logout, retrieve all or a single q
   To run the tests:
       
    ```
-   nosetests tests/
+   $nosetests tests/
   ```
+
+
 ## Built with 
    Flask, a python framework
    
