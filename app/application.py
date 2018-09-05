@@ -3,7 +3,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
-from instance import app_config
+from instance.config import app_config
 
 def create_app(config_name):
     '''function enclosing the Flask App'''
