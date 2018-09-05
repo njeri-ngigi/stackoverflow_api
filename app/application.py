@@ -1,14 +1,18 @@
 '''app/application.py'''
+import psycopg2
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
 from instance.config import app_config
+from app.setup_database import SetupDB
 
 def create_app(config_name):
     '''function enclosing the Flask App'''
     from app.views import (Signup, Login, Logout, BLACKLIST,
                            Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId)
+
+    SetupDB(config_name)
 
     app = Flask(__name__)
     api = Api(app)
