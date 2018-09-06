@@ -1,5 +1,6 @@
 '''app/setup_database.py'''
 import psycopg2
+from werkzeug.security import generate_password_hash, check_password_hash
 from instance.config import app_config
 
 class SetupDB(object):
@@ -10,21 +11,28 @@ class SetupDB(object):
         db_connection = psycopg2.connect(connection_string)
         #create a psycopg2 cursor
         cursor = db_connection.cursor()
-        
+
         cursor.execute('''CREATE TABLE IF NOT EXISTS questions(
                 question_id   SERIAL PRIMARY KEY,
                 q_title       VARCHAR(20)  NOT NULL,
-                q_content     VARCHAR(200)  NOT NULL
+                q_content     VARCHAR(200)  NOT NULL,
+                q_username    VARCHAR(20) NOT NULL
                 );''')
 
         cursor.execute('''CREATE TABLE IF NOT EXISTS users(
                 user_id    SERIAL PRIMARY KEY,
                 name       TEXT         NOT NULL,
-                username   VARCHAR(20)  NOT NULL,
+                username   VARCHAR(20)  UNIQUE NOT NULL,
                 email      VARCHAR(50)  NOT NULL,
                 password   VARCHAR(150) NOT NULL
                 );''')
-        
+
+        cursor.execute('''CREATE TABLE IF NOT EXISTS revoked_tokens(
+                token_id                SERIAL PRIMARY KEY,
+                json_token_identifier   VARCHAR(200)
+                );''')
+
         db_connection.commit()
         cursor.close()
         db_connection.close()
+    
