@@ -5,6 +5,7 @@ from flask import request
 from flask_jwt_extended import (jwt_required, get_jwt_identity)
 
 from app.models import User, Question
+from app.questions_model import QuestionsModel
 
 class Questions(Resource):
     '''class representing retrieving all questions and posting questing endpoint'''
@@ -33,7 +34,10 @@ class Questions(Resource):
         if not title or not content:
             return dict(message="Title or Content fields missing"), 400
         username = get_jwt_identity()
-        result = User.post_question(title, content, username)
+        my_question = QuestionsModel()
+        result = my_question.post_question(title, content, username)
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
         return dict(message=result["title"] + ", Posted!"), 201
 
 class QuestionsQuestionId(Resource):
