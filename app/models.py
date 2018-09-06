@@ -1,6 +1,12 @@
 '''app/models.py'''
+import os
+import psycopg2
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
+from instance.config import app_config
+
+CURRENT_ENVIRONMENT = os.environ['ENV']
+CONN_STRING = app_config[CURRENT_ENVIRONMENT].CONNECTION_STRING
 
 ALL_USERS = {}
 ALL_QUESTIONS = []
@@ -9,12 +15,8 @@ class Question(object):
     '''Question class model'''
     def __init__(self, u_title, u_content, u_username):
         '''set up class variables'''
-        self.title = u_title
-        self.content = u_content
-        self.timestamp = date.today
-        self.username = u_username
-        self.answers = []
-        self.answer_accepted = "none"
+        self.conn = psycopg2.connect(CONN_STRING)
+        self.cursor = self.conn.cursor()
 
     @classmethod
     def get_all_questions(cls):
@@ -32,37 +34,41 @@ class User(object):
     '''User class model'''
     def __init__(self):
         '''set up class variables'''
-        self.user = {}
+        self.conn = psycopg2.connect(CONN_STRING)
+        self.cursor = self.conn.cursor()
 
     def add_user(self, name, username, email, password):
         '''Add a user'''
-        if username in ALL_USERS:
-            return dict(message="Username already exists. Try a different one.", error=409)
-        self.user["name"] = name
-        self.user["email"] = email
         pw_hash = generate_password_hash(password)
-        self.user["password"] = pw_hash
+        # check if username already exists
+        self.cursor.execute("select * from users where username = (%s);", (username,))
+        result = self.cursor.fetchone()
+        if not result:
+            sql = """INSERT INTO users(name, username, email, password)
+                     VALUES(%s, %s, %s, %s);"""
+            self.cursor.execute(sql, (name, username, email, pw_hash))
+            self.conn.commit()
+            # check that user was signed up
+            self.cursor.execute("select * from users where username = (%s);", (username,))
+            result2 = self.cursor.fetchone()
+            self.conn.close()
+            if not result2:
+                return dict(message="Failed to signup, try again.", error=404)
+            return dict(message="Welcome " + username + "!")
+        self.conn.close()
+        return dict(message="Username already exists. Try a different one.")
 
-        ALL_USERS[username] = self.user
-
-        return dict(message="Welcome " + username + "!")
-
-    @classmethod
-    def login(cls, username, password):
+    def login(self, username, password):
         '''login user'''
-        if username in ALL_USERS:
-            result = check_password_hash(ALL_USERS[username]["password"], password)
-            if result:
-                return dict(message="Welcome back, " + username + "!")
-            return dict(message="Incorrect password", error=401)
-        return dict(message="Username doesn't exixt. Try Signing up.", error=401)
-
-    @classmethod
-    def post_question(cls, title, content, username):
-        '''Post question'''
-        new_question = Question(title, content, username)
-        ALL_QUESTIONS.append(new_question)
-        return dict(title=title)
+        self.cursor.execute("SELECT username, password FROM users WHERE username = (%s);", (username,))
+        result = self.cursor.fetchone()
+        self.conn.close()
+        if not result:
+            return dict(message="Username doesn't exixt. Try Signing up.", error=401)
+        is_password_correct = check_password_hash(result[1], password)
+        if is_password_correct:
+            return dict(message="Welcome back, " + username + "!")
+        return dict(message="Incorrect password", error=401)
 
     @classmethod
     def post_answer(cls, question_id, username, content):
