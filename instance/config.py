@@ -9,12 +9,12 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     '''configurations for development'''
-    Debug = True
+    DEBUG = True
 
 class TestingConfig(Config):
     '''configurations for testing with a separate test database'''
     TESTING = True
-    Debug = True
+    DEBUG = True
     CONNECTION_STRING = "dbname='test_db' user='postgres' host='localhost' password='testme'"
     # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:testme@localhost/test_db'
 
