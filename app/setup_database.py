@@ -32,6 +32,14 @@ class SetupDB(object):
                 json_token_identifier   VARCHAR(200)
                 );''')
 
+        cursor.execute('''CREATE TABLE IF NOT EXISTS answers(
+                answer_id  SERIAL NOT NULL,
+                q_id       INTEGER REFERENCES questions(question_id),
+                a_content  VARCHAR(200) NOT NULL,
+                a_username VARCHAR(20) NOT NULL,
+                PRIMARY KEY (answer_id, q_id)
+                );''')
+
         db_connection.commit()
         cursor.close()
         db_connection.close()
