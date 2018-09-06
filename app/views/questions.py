@@ -33,6 +33,12 @@ class Questions(Resource):
         content = data.get("content")
         if not title or not content:
             return dict(message="Title or Content fields missing"), 400
+        #check for whitespaces
+        title = title.strip()
+        content = content.strip()
+        if not title or not content:
+            return dict(message="Enter valid data")
+            
         username = get_jwt_identity()
         my_question = QuestionsModel()
         result = my_question.post_question(title, content, username)
@@ -77,6 +83,11 @@ class QuestionsAnswers(Resource):
         content = data.get("content")
         if not content:
             return dict(message="Please enter answer content")
+        #check for whitespaces
+        content = content.strip()
+        if not content:
+            return dict(message="Enter valid data")
+
         username = get_jwt_identity()
         q_id = ast.literal_eval(question_id)
         result = User.post_answer(q_id, username, content)

@@ -37,39 +37,6 @@ class User(object):
         self.conn = psycopg2.connect(CONN_STRING)
         self.cursor = self.conn.cursor()
 
-    def add_user(self, name, username, email, password):
-        '''Add a user'''
-        pw_hash = generate_password_hash(password)
-        # check if username already exists
-        self.cursor.execute("select * from users where username = (%s);", (username,))
-        result = self.cursor.fetchone()
-        if not result:
-            sql = """INSERT INTO users(name, username, email, password)
-                     VALUES(%s, %s, %s, %s);"""
-            self.cursor.execute(sql, (name, username, email, pw_hash))
-            self.conn.commit()
-            # check that user was signed up
-            self.cursor.execute("select * from users where username = (%s);", (username,))
-            result2 = self.cursor.fetchone()
-            self.conn.close()
-            if not result2:
-                return dict(message="Failed to signup, try again.", error=404)
-            return dict(message="Welcome " + username + "!")
-        self.conn.close()
-        return dict(message="Username already exists. Try a different one.")
-
-    def login(self, username, password):
-        '''login user'''
-        self.cursor.execute("SELECT username, password FROM users WHERE username = (%s);", (username,))
-        result = self.cursor.fetchone()
-        self.conn.close()
-        if not result:
-            return dict(message="Username doesn't exixt. Try Signing up.", error=401)
-        is_password_correct = check_password_hash(result[1], password)
-        if is_password_correct:
-            return dict(message="Welcome back, " + username + "!")
-        return dict(message="Incorrect password", error=401)
-
     @classmethod
     def post_answer(cls, question_id, username, content):
         '''Post answer'''

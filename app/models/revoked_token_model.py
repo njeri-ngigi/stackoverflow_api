@@ -1,4 +1,4 @@
-'''revoked_token_model.py'''
+'''app/models/revoked_token_model.py'''
 import os
 import psycopg2
 from instance.config import app_config

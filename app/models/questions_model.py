@@ -1,3 +1,4 @@
+'''app/models/questions_model.py'''
 import os
 import psycopg2
 from instance.config import app_config
@@ -20,6 +21,11 @@ class QuestionsModel(object):
         self.conn.commit()
         self.cursor.execute("SELECT q_title FROM questions WHERE q_title = (%s);", (title,))
         result = self.cursor.fetchone()
+        self.conn.close()
         if not result:
             return dict(message="Failed to add question. Try again.", error=404)
         return dict(title=title)
+
+    def get_all_questions(self):
+        '''get all questions'''
+        #return ALL_QUESTIONS
