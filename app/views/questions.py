@@ -4,21 +4,21 @@ from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import (jwt_required, get_jwt_identity)
 
-from app.models import User, Question
-from app.questions_model import QuestionsModel
+from app.models1 import User, Question
+from app.models.questions_model import QuestionsModel
 
 class Questions(Resource):
     '''class representing retrieving all questions and posting questing endpoint'''
     @classmethod
     def get(cls):
         '''get all questions'''
-        result = Question.get_all_questions()
+        my_question = QuestionsModel()
+        result = my_question.get_all_questions()
         if not result:
             return result, 200
         all_questions = []
         for i in result:
-            question = dict(title=i.title, content=i.content, username=i.username,
-                            answers=i.answers, accepted_answer=i.answer_accepted)
+            question = dict(id=i[0], title=i[1], content=i[2], username=i[3])
             all_questions.append(question)
         return all_questions, 200
 
@@ -52,13 +52,11 @@ class QuestionsQuestionId(Resource):
     def get(cls, question_id):
         '''get single question'''
         q_id = ast.literal_eval(question_id)
-        u_question = Question.get_single_question(q_id)
-        if "message" in u_question:
-            return dict(message=u_question["message"]), u_question["error"]
-        question = u_question["question"]
-        result = dict(title=question.title, content=question.content, username=question.username,
-                      answers=question.answers, accepted_answer=question.answer_accepted)
-        return result, 200
+        my_question = QuestionsModel()
+        result = my_question.get_single_question(q_id)
+        if "message" in result:
+            return dict(message=result["message"]), result["error"]
+        return dict(title=result[1], content=result[2], username=result[3]), 200
 
     @classmethod
     @jwt_required
@@ -66,7 +64,8 @@ class QuestionsQuestionId(Resource):
         '''delete single question'''
         username = get_jwt_identity()
         q_id = ast.literal_eval(question_id)
-        result = User.delete_question(q_id, username)
+        my_question = QuestionsModel()
+        result = my_question.delete_question(q_id, username)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200
