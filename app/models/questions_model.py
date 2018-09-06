@@ -28,4 +28,36 @@ class QuestionsModel(object):
 
     def get_all_questions(self):
         '''get all questions'''
-        #return ALL_QUESTIONS
+        self.cursor.execute("SELECT * FROM questions")
+        result = self.cursor.fetchall()
+        self.conn.close()
+        return result
+
+    def get_single_question(self, question_id):
+        '''get single question'''
+        self.cursor.execute("SELECT * FROM questions WHERE question_id = (%s);", (question_id,))
+        result = self.cursor.fetchone()
+        self.conn.close()
+        if not result:
+            return dict(message="Question doesn't exist", error=404)
+        return result
+
+    def delete_question(self, question_id, username):
+        '''Delete question'''
+        self.cursor.execute("SELECT * FROM questions WHERE question_id = (%s);", (question_id,))
+        result = self.cursor.fetchone()
+        if not result:
+            self.conn.close()
+            return dict(message="Question doesn't exist", error=404)
+        if username != result[3]:
+            self.conn.close()
+            return dict(message="Unauthorized to delete this question", error=401)
+        self.cursor.execute("DELETE FROM questions WHERE question_id = (%s);", (question_id,))
+        self.conn.commit()
+        # check if question is deleted
+        self.cursor.execute("SELECT * FROM questions WHERE question_id = (%s);", (question_id,))
+        result2 = self.cursor.fetchone()
+        self.conn.close()
+        if result2:
+            return dict(message="Failed to delete question. Try again.")
+        return dict(message="Question " + "#" + str(question_id) + " Deleted Successfully")
