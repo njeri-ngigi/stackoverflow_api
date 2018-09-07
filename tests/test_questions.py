@@ -54,6 +54,22 @@ class TestQuestions(unittest.TestCase):
         my_data = json.loads(result.data)
         self.assertEqual(result.status_code, 201)
         self.assertEqual("Baking a sponge cake, Posted!", my_data["message"])
+        # test missing fields
+        result2 = self.client().post('/api/v1/questions',
+                                    headers=dict(Authorization="Bearer " + self.a_token),
+                                    content_type="application/json",
+                                    data=json.dumps({}))
+        my_data2 = json.loads(result2.data)
+        self.assertEqual(result2.status_code, 400)
+        self.assertEqual("Fields cannot be empty", my_data2["message"])
+        # test whitespaces
+        result3 = self.client().post('/api/v1/questions',
+                                    headers=dict(Authorization="Bearer " + self.a_token),
+                                    content_type="application/json",
+                                    data=json.dumps({"title":"  ", "content": "  "}))
+        my_data3 = json.loads(result3.data)
+        self.assertEqual(result3.status_code, 400)
+        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data3["message"])
 
     def test_get_questions(self):
         '''test getting all questions and single questions'''
@@ -83,7 +99,7 @@ class TestQuestions(unittest.TestCase):
         current_length = len(my_data)
 
         result2 = self.client().delete('/api/v1/questions/2',
-                                       headers=dict(Authorization="Bearer " + self.a_token))
+                                       headers=dict(Authorization="Bearer " + self.a_token2))
         my_data2 = json.loads(result2.data)
         self.assertEqual("Question #2 Deleted Successfully", my_data2["message"])
         self.assertEqual(result2.status_code, 200)

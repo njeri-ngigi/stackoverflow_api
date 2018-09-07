@@ -61,6 +61,24 @@ class TestQuestionAnswers(unittest.TestCase):
         self.assertEqual(result2.status_code, 404)
         self.assertEqual("Question doesn't exist", my_data2["message"])
 
+        #test missing fields
+        result3 = self.client().post('/api/v1/questions/0/answers',
+                                     headers=dict(Authorization="Bearer " + self.a_token2),
+                                     content_type="application/json",
+                                     data=json.dumps({}))
+        my_data3 = json.loads(result3.data)
+        self.assertEqual(result3.status_code, 400)
+        self.assertEqual("Field(s) cannot be empty", my_data3["message"])
+        #test whitespaces
+        result4 = self.client().post('/api/v1/questions/20/answers',
+                                     headers=dict(Authorization="Bearer " + self.a_token2),
+                                     content_type="application/json",
+                                     data=json.dumps({"content": "  "}))
+        my_data4 = json.loads(result4.data)
+        self.assertEqual(result4.status_code, 400)
+        self.assertEqual("Enter valid data. Look out for whitespaces in fields.",
+                         my_data4["message"])
+
     def test_accept_update_answer(self):
         '''test accepting and updating answer'''
         #user2 posts answer
