@@ -14,9 +14,10 @@ class SetupDB(object):
 
         cursor.execute('''CREATE TABLE IF NOT EXISTS questions(
                 question_id   SERIAL PRIMARY KEY,
-                q_title       VARCHAR(20)  NOT NULL,
+                q_title       VARCHAR(50)  NOT NULL,
                 q_content     VARCHAR(200)  NOT NULL,
                 q_username    VARCHAR(20) NOT NULL
+                q_accepted_answer INTEGER DEFAULT 0
                 );''')
 
         cursor.execute('''CREATE TABLE IF NOT EXISTS users(
@@ -34,9 +35,10 @@ class SetupDB(object):
 
         cursor.execute('''CREATE TABLE IF NOT EXISTS answers(
                 answer_id  SERIAL NOT NULL,
-                q_id       INTEGER REFERENCES questions(question_id),
+                q_id       INTEGER REFERENCES questions(question_id) ON DELETE CASCADE,
                 a_content  VARCHAR(200) NOT NULL,
                 a_username VARCHAR(20) NOT NULL,
+                accepted   TEXT DEFAULT false,
                 PRIMARY KEY (answer_id, q_id)
                 );''')
 
