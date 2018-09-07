@@ -14,16 +14,16 @@ class RegisterUserTestCase(unittest.TestCase):
         #test successful registration
         result = self.client().post('/api/v1/auth/signup',
                                     content_type="application/json",
-                                    data=json.dumps({"name": "Njeri", "username": "njery",
+                                    data=json.dumps({"name": "Njeri", "username": "kama",
                                                      "email": "njeri@to.cm", "password": "Test123",
                                                      "confirm_password": "Test123"}))
         my_data = json.loads(result.data)
         self.assertEqual(result.status_code, 201)
-        self.assertEqual("Welcome njery!", my_data["message"])
+        self.assertEqual("Welcome kama!", my_data["message"])
         #test registration using the same username
         result2 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
-                                     data=json.dumps({"name": "Njeri", "username": "njery",
+                                     data=json.dumps({"name": "Njeri", "username": "kama",
                                                       "email": "njeri@to.cm", "password": "Test123",
                                                       "confirm_password": "Test123"}))
         my_data2 = json.loads(result2.data)
