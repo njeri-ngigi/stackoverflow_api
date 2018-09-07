@@ -32,8 +32,17 @@ class Questions(Resource):
         content = data.get("content")
         if not title or not content:
             return dict(message="Title or Content fields missing"), 400
+
+        #check for whitespaces
+        title = title.strip()
+        content = content.strip()
+        if not title or not content:
+            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+
         username = get_jwt_identity()
         result = User.post_question(title, content, username)
+        if "error" in result:
+            return dict(message=result["message"], question_id=result["question_id"]), result["error"] 
         return dict(message=result["title"] + ", Posted!"), 201
 
 class QuestionsQuestionId(Resource):
@@ -69,13 +78,21 @@ class QuestionsAnswers(Resource):
         '''post answer'''
         data = request.get_json()
         if not data:
-            return dict(message="Field(s) cannot be empty")
+            return dict(message="Field(s) cannot be empty"), 400
         content = data.get("content")
         if not content:
-            return dict(message="Please enter answer content")
+            return dict(message="Please enter answer content"), 400
+
+        #check for whitespaces
+        content = content.strip()
+        if not content:
+            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+
         username = get_jwt_identity()
         q_id = ast.literal_eval(question_id)
         result = User.post_answer(q_id, username, content)
+        if "answer_id" in result:
+            return dict(message=result["message"], question_id=result["question_id"], answer_id=result["answer_id"]), result["error"]
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 201
@@ -95,6 +112,10 @@ class QuestionsAnswersId(Resource):
             content = data.get("content")
             if not content:
                 return dict(message="Please enter answer content")
+            #check for whitespaces
+            content = content.strip()
+            if not content:
+                return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
             result = User.update_answer(q_id, a_id, username, content)
             if "error" in result:
                 return dict(message=result["message"]), result["error"]

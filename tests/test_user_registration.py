@@ -14,12 +14,12 @@ class RegisterUserTestCase(unittest.TestCase):
         #test successful registration
         result = self.client().post('/api/v1/auth/signup',
                                     content_type="application/json",
-                                    data=json.dumps({"name": "Njeri", "username": "nje_ry",
+                                    data=json.dumps({"name": "Njeri", "username": "njery",
                                                      "email": "njeri@to.cm", "password": "Test123",
                                                      "confirm_password": "Test123"}))
         my_data = json.loads(result.data)
         self.assertEqual(result.status_code, 201)
-        self.assertEqual("Welcome nje_ry!", my_data["message"])
+        self.assertEqual("Welcome njery!", my_data["message"])
         #test registration using the same username
         result2 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
@@ -44,6 +44,16 @@ class RegisterUserTestCase(unittest.TestCase):
         self.assertEqual(result4.status_code, 400)
         self.assertEqual("name, username, email, password or confirm_password fields missing",
                          my_data4["message"])
+        #test whitespaces
+        result5 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "  ", "username": "njery",
+                                                     "email": "njeri@to.cm", "password": "Test123",
+                                                     "confirm_password": "Test123"}))
+        my_data5 = json.loads(result5.data)
+        self.assertEqual(result5.status_code, 400)
+        self.assertEqual("Enter valid data. Look out for whitespaces in fields.",
+                         my_data5["message"])
 
     def test_validate_data(self):
         '''Test validating user input'''
@@ -73,7 +83,7 @@ class RegisterUserTestCase(unittest.TestCase):
                                                       "confirm_password": "123"}))
         my_data3 = json.loads(result3.data)
         self.assertEqual(result3.status_code, 400)
-        self.assertEqual("password is too short", my_data3["message"])
+        self.assertEqual("password is too short, it should be 6 characters or more", my_data3["message"])
         #test weak password
         result4 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",

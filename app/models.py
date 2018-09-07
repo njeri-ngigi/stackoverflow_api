@@ -60,6 +60,11 @@ class User(object):
     @classmethod
     def post_question(cls, title, content, username):
         '''Post question'''
+        for i in ALL_QUESTIONS:
+            if i.title == title:
+                q_index = ALL_QUESTIONS.index(i)
+                return dict(message="Question has already been asked. Vist question #" +
+                           str(q_index), question_id=q_index, error=409)
         new_question = Question(title, content, username)
         ALL_QUESTIONS.append(new_question)
         return dict(title=title)
@@ -70,6 +75,12 @@ class User(object):
         if question_id >= len(ALL_QUESTIONS):
             return dict(message="Question doesn't exist", error=404)
         question = ALL_QUESTIONS[question_id]
+        for i in question.answers:
+            if username == username:
+                if i[username] == content:
+                    a_index = question.answers.index(i)
+                    return dict(message="You have already posted this answer. To edit answer visit question #" + 
+                                str(question_id) + " answer #" + str(a_index), question_id=question_id, answer_id=a_index, error=409) 
         question.answers.append({username:content})
         return dict(message="Answer Posted!")
 
