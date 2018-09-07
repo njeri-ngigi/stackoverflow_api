@@ -18,7 +18,7 @@ class Validate(object):
     def validate_password(self, password, confirm_password):
         '''method checking pasword requirements'''
         if len(password) < 6:
-            return {"message": "password is too short"}
+            return {"message": "password is too short, it should be 6 characters or more"}
         if bool(re.search(r'[A-Z][a-z]|[a-z][A-Z]', password)) is False:
             return {"message": "password must contain a mix of upper and lowercase letters"}
         if bool(re.search(self.special_character_regex, password)) is False:
@@ -39,7 +39,7 @@ class Validate(object):
         for i in my_list:
             i = i.strip()
             if not i:
-                return {"message": "Enter valid data"}
+                return {"message": "Enter valid data. Look out for whitespaces in fields."}
         email = self.validate_email(email)
         password = self.validate_password(password, confirm_password)
         name = self.validate_name(name)
