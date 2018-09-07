@@ -7,7 +7,7 @@ CURRENT_ENVIRONMENT = os.environ['ENV']
 CONN_STRING = app_config[CURRENT_ENVIRONMENT].CONNECTION_STRING
 
 class QuestionsModel(object):
-    '''User class model'''
+    '''questions class model'''
     def __init__(self):
         '''set up class variables'''
         self.conn = psycopg2.connect(CONN_STRING)
@@ -16,13 +16,12 @@ class QuestionsModel(object):
     def post_question(self, title, content, username):
         '''Post a question'''
         sql = """INSERT INTO questions(q_title, q_content, q_username)
-                 VALUES(%s, %s, %s);"""
+                 VALUES(%s, %s, %s) RETURNING question_id;"""
         self.cursor.execute(sql, (title, content, username))
+        q_id = self.cursor.fetchone()[0]
         self.conn.commit()
-        self.cursor.execute("SELECT q_title FROM questions WHERE q_title = (%s);", (title,))
-        result = self.cursor.fetchone()
-        self.conn.close()
-        if not result:
+        self.cursor.close()
+        if not q_id:
             return dict(message="Failed to add question. Try again.", error=404)
         return dict(title=title)
 

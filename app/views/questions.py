@@ -4,8 +4,8 @@ from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import (jwt_required, get_jwt_identity)
 
-from app.models1 import User, Question
 from app.models.questions_model import QuestionsModel
+from app.models.answers_model import AnswersModel
 
 class Questions(Resource):
     '''class representing retrieving all questions and posting questing endpoint'''
@@ -89,10 +89,25 @@ class QuestionsAnswers(Resource):
 
         username = get_jwt_identity()
         q_id = ast.literal_eval(question_id)
-        result = User.post_answer(q_id, username, content)
+        my_answer = AnswersModel()
+        result = my_answer.post_answer(q_id, content, username)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 201
+
+    @classmethod
+    def get(cls, question_id):
+        q_id = ast.literal_eval(question_id)
+        my_answer = AnswersModel()
+        result = my_answer.get_all_answers_to_question(q_id)
+
+        if "message" in result:
+            return result, 200
+        all_answers = []
+        for i in result:
+            answer = {i[2]:i[3]}
+            all_answers.append(answer)
+        return all_answers, 200
 
 class QuestionsAnswersId(Resource):
     '''class representing activities for a question's answers'''
@@ -104,17 +119,20 @@ class QuestionsAnswersId(Resource):
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
         username = get_jwt_identity()
-        #Update an answer
+        content = ""
+        action = "accept"
         if data:
             content = data.get("content")
             if not content:
                 return dict(message="Please enter answer content")
-            result = User.update_answer(q_id, a_id, username, content)
-            if "error" in result:
-                return dict(message=result["message"]), result["error"]
-            return result, 200
-        #Accept an answer
-        result2 = User.accept_answer(q_id, a_id, username)
-        if "error" in result2:
-            return dict(message=result2["message"]), result2["error"]
-        return result2, 200
+
+            content = content.strip()
+            if not content:
+                return dict(message="Enter valid data")
+            action = "update" 
+        my_answer = AnswersModel()
+        result = my_answer.update_or_accept_answer(q_id, a_id, username, content, action) 
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        return result, 200
+        
