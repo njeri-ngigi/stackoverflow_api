@@ -37,7 +37,7 @@ class Questions(Resource):
         title = title.strip()
         content = content.strip()
         if not title or not content:
-            return dict(message="Enter valid data")
+            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
             
         username = get_jwt_identity()
         my_question = QuestionsModel()

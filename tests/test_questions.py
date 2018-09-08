@@ -1,7 +1,11 @@
 '''tests/test_questions.py'''
+import os
+import psycopg2
 import unittest
 import json
+
 from app.application import create_app
+from instance.config import app_config
 
 class TestQuestions(unittest.TestCase):
     '''Class testing questions'''
@@ -44,16 +48,37 @@ class TestQuestions(unittest.TestCase):
                            content_type="application/json",
                            data=json.dumps({"title": "Baby Shower",
                                             "content": "How to throw a greate baby shower"}))
-    def test_questions(self):
+    def test_post_questions(self):
         '''test handling posting questions'''
+        #successfull post question
         result = self.client().post('/api/v1/questions',
                                     headers=dict(Authorization="Bearer " + self.a_token),
                                     content_type="application/json",
                                     data=json.dumps({"title": "Baking a sponge cake",
                                                      "content": "How many eggs to put in cake"}))
+        result2 = self.client().post('/api/v1/questions',
+                                    headers=dict(Authorization="Bearer " + self.a_token),
+                                    content_type="application/json",
+                                    data=json.dumps({"title": "Baking a sponge cake",
+                                                     "content": "How many eggs to put in cake"}))
+        #post question with the same title        
         my_data = json.loads(result.data)
         self.assertEqual(result.status_code, 201)
         self.assertEqual("Baking a sponge cake, Posted!", my_data["message"])
+
+        my_data2 = json.loads(result2.data)
+        self.assertEqual(result2.status_code, 409)
+        self.assertEqual("Question has already been asked. Visit question #4", my_data2["message"])
+        #test whitespaces
+        result3 = self.client().post('/api/v1/questions',
+                                    headers=dict(Authorization="Bearer " + self.a_token),
+                                    content_type="application/json",
+                                    data=json.dumps({"title": "  ",
+                                                     "content": "  "}))
+        #test missing input data
+        my_data3 = json.loads(result3.data)
+        self.assertEqual(result3.status_code, 400)
+        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data3["message"])
 
     def test_get_questions(self):
         '''test getting all questions and single questions'''
@@ -64,7 +89,7 @@ class TestQuestions(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
 
         #test get single question
-        result2 = self.client().get('/api/v1/questions/0')
+        result2 = self.client().get('/api/v1/questions/1')
         my_data2 = json.loads(result2.data)
         self.assertEqual("Git branching", my_data2["title"])
         self.assertEqual(result2.status_code, 200)
@@ -83,7 +108,7 @@ class TestQuestions(unittest.TestCase):
         current_length = len(my_data)
 
         result2 = self.client().delete('/api/v1/questions/2',
-                                       headers=dict(Authorization="Bearer " + self.a_token))
+                                       headers=dict(Authorization="Bearer " + self.a_token2))
         my_data2 = json.loads(result2.data)
         self.assertEqual("Question #2 Deleted Successfully", my_data2["message"])
         self.assertEqual(result2.status_code, 200)
@@ -93,7 +118,7 @@ class TestQuestions(unittest.TestCase):
         self.assertEqual(len(my_data3), current_length-1)
 
         #test unauthorized delete
-        result4 = self.client().delete('/api/v1/questions/0',
+        result4 = self.client().delete('/api/v1/questions/1',
                                        headers=dict(Authorization="Bearer " + self.a_token2))
         my_data4 = json.loads(result4.data)
         self.assertEqual("Unauthorized to delete this question", my_data4["message"])
@@ -105,3 +130,12 @@ class TestQuestions(unittest.TestCase):
         my_data5 = json.loads(result5.data)
         self.assertEqual("Question doesn't exist", my_data5["message"])
         self.assertEqual(result5.status_code, 404)
+
+    def tearDown(self):
+        current_environemt = os.environ['ENV']
+        conn_string = app_config[current_environemt].CONNECTION_STRING
+        conn = psycopg2.connect(conn_string)
+        cursor = conn.cursor()
+        cursor.execute("DROP TABLE answers, questions, revoked_tokens, users")
+        conn.commit()
+        conn.close()
