@@ -18,8 +18,13 @@ class User(object):
         '''Add a user'''
         pw_hash = generate_password_hash(password)
         # check if username already exists
+        self.cursor.execute("select * from users where email = (%s);", (email,))
+        result = self.cursor.fetchone()
+        if result:
+            return dict(message="Email already in use. Try a different one.", error=409)
         self.cursor.execute("select * from users where username = (%s);", (username,))
         result = self.cursor.fetchone()
+        
         if not result:
             sql = """INSERT INTO users(name, username, email, password)
                      VALUES(%s, %s, %s, %s);"""

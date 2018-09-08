@@ -15,8 +15,14 @@ class QuestionsModel(object):
 
     def post_question(self, title, content, username):
         '''Post a question'''
+        self.cursor.execute("SELECT * FROM questions WHERE q_title = (%s);",(title, ))
+        result = self.cursor.fetchone()
+        if result:
+            return dict(message="Question has already been asked. Visit question #" + 
+                        str(result[0]), question_id=result[0], error=409)
         sql = """INSERT INTO questions(q_title, q_content, q_username)
                  VALUES(%s, %s, %s) RETURNING question_id;"""
+        
         self.cursor.execute(sql, (title, content, username))
         q_id = self.cursor.fetchone()[0]
         self.conn.commit()
