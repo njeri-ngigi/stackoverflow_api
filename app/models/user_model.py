@@ -18,27 +18,28 @@ class User(object):
         '''Add a user'''
         pw_hash = generate_password_hash(password)
         # check if username already exists
-        self.cursor.execute("select * from users where email = (%s);", (email,))
-        result = self.cursor.fetchone()
-        if result:
-            return dict(message="Email already in use. Try a different one.", error=409)
         self.cursor.execute("select * from users where username = (%s);", (username,))
         result = self.cursor.fetchone()
-        
-        if not result:
-            sql = """INSERT INTO users(name, username, email, password)
-                     VALUES(%s, %s, %s, %s);"""
-            self.cursor.execute(sql, (name, username, email, pw_hash))
-            self.conn.commit()
-            # check that user was signed up
-            self.cursor.execute("select * from users where username = (%s);", (username,))
-            result2 = self.cursor.fetchone()
+        if result:
             self.conn.close()
-            if not result2:
-                return dict(message="Failed to signup, try again.", error=404)
-            return dict(message="Welcome " + username + "!")
+            return dict(message="Username already exists. Try a different one.", error=409)
+        self.cursor.execute("select * from users where email = (%s);", (email,))
+        result2 = self.cursor.fetchone()
+        if result2:
+            return dict(message="Email already in use. Try a different one.", error=409)
+       
+        sql = """INSERT INTO users(name, username, email, password)
+                 VALUES(%s, %s, %s, %s);"""
+        self.cursor.execute(sql, (name, username, email, pw_hash))
+        self.conn.commit()
+        # check that user was signed up
+        self.cursor.execute("select * from users where username = (%s);", (username,))
+        result2 = self.cursor.fetchone()
         self.conn.close()
-        return dict(message="Username already exists. Try a different one.")
+        if not result2:
+            return dict(message="Failed to signup, try again.", error=404)
+        return dict(message="Welcome " + username + "!")
+        
 
     def login(self, username, password):
         '''login user'''
