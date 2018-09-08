@@ -87,7 +87,7 @@ class RegisterUserTestCase(unittest.TestCase):
                                                       "confirm_password": "123"}))
         my_data3 = json.loads(result3.data)
         self.assertEqual(result3.status_code, 400)
-        self.assertEqual("password is too short", my_data3["message"])
+        self.assertEqual("password is too short. Minimum length is 6 characters.", my_data3["message"])
         #test weak password
         result4 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
@@ -117,6 +117,15 @@ class RegisterUserTestCase(unittest.TestCase):
         my_data6 = json.loads(result6.data)
         self.assertEqual(result6.status_code, 400)
         self.assertEqual("Passwords don't match", my_data6["message"])
+        #test for whitespaces
+        result7 = self.client().post('/api/v1/auth/signup',
+                                    content_type="application/json",
+                                    data=json.dumps({"name": "  ", "username": "  ",
+                                                     "email": "njery@to.cm", "password": "Test123",
+                                                     "confirm_password": "Test123"}))
+        my_data7 = json.loads(result7.data)
+        self.assertEqual(result7.status_code, 400)
+        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data7["message"])
 
     def test_login_logout(self):
         '''Test user login and logout'''
