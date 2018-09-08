@@ -16,7 +16,7 @@ class SetupDB(object):
                 question_id   SERIAL PRIMARY KEY,
                 q_title       VARCHAR(50)  NOT NULL,
                 q_content     VARCHAR(200)  NOT NULL,
-                q_username    VARCHAR(20) NOT NULL
+                q_username    VARCHAR(20) NOT NULL,
                 q_accepted_answer INTEGER DEFAULT 0
                 );''')
 
@@ -24,7 +24,7 @@ class SetupDB(object):
                 user_id    SERIAL PRIMARY KEY,
                 name       TEXT         NOT NULL,
                 username   VARCHAR(20)  UNIQUE NOT NULL,
-                email      VARCHAR(50)  NOT NULL,
+                email      VARCHAR(50)  UNIQUE NOT NULL,
                 password   VARCHAR(150) NOT NULL
                 );''')
 
@@ -38,7 +38,7 @@ class SetupDB(object):
                 q_id       INTEGER REFERENCES questions(question_id) ON DELETE CASCADE,
                 a_content  VARCHAR(200) NOT NULL,
                 a_username VARCHAR(20) NOT NULL,
-                accepted   TEXT DEFAULT false,
+                accepted   INTEGER DEFAULT 0,
                 PRIMARY KEY (answer_id, q_id)
                 );''')
 
