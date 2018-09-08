@@ -43,7 +43,7 @@ class Questions(Resource):
         my_question = QuestionsModel()
         result = my_question.post_question(title, content, username)
         if "error" in result:
-            return dict(message=result["message"]), result["error"]
+            return dict(message=result["message"], question_id=result["question_id"]), result["error"]
         return dict(message=result["title"] + ", Posted!"), 201
 
 class QuestionsQuestionId(Resource):
@@ -75,7 +75,7 @@ class QuestionsAnswers(Resource):
     @classmethod
     @jwt_required
     def post(cls, question_id):
-        '''post answer'''
+        '''post an answer'''
         data = request.get_json()
         if not data:
             return dict(message="Field(s) cannot be empty")
@@ -91,8 +91,11 @@ class QuestionsAnswers(Resource):
         q_id = ast.literal_eval(question_id)
         my_answer = AnswersModel()
         result = my_answer.post_answer(q_id, content, username)
+        if "question_id" in result:
+            return dict(message=result["message"], question_id=result["question_id"], 
+                        answer_id=result["answer_id"]), result["error"]
         if "error" in result:
-            return dict(message=result["message"]), result["error"]
+            return dict(message=result["message"], question_id=result["question_id"]), result["error"]
         return result, 201
 
     @classmethod
@@ -100,12 +103,15 @@ class QuestionsAnswers(Resource):
         q_id = ast.literal_eval(question_id)
         my_answer = AnswersModel()
         result = my_answer.get_all_answers_to_question(q_id)
-
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
         if "message" in result:
             return result, 200
         all_answers = []
         for i in result:
-            answer = {i[2]:i[3]}
+            answer = {i[3]:i[2]}
+            if i[4] == 1:
+                answer["accepted"] = "true"
             all_answers.append(answer)
         return all_answers, 200
 
