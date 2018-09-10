@@ -22,7 +22,8 @@ def create_app(config_name):
     app.url_map.strict_slashes = False
     app.config.from_object(app_config[config_name])
     app.config["TESTING"] = True
-
+    if config_name == "testing":
+        app.config['JWT_SECRET_KEY'] = 'j23j434939232i4%#$hjhj2eAJS2e2e3'
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
     app.config['JWT_BLACKLIST_ENABLED'] = True
     app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access']
