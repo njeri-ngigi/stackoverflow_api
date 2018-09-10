@@ -120,7 +120,7 @@ class AnswersModel(object):
             if user_vote == -1:
                 downvotes = downvotes - 1
                 self.cursor.execute("UPDATE answers SET downvotes = (%s) WHERE answer_id = (%s);", (downvotes, answer_id,))
-                self.cursor.execute("UPDATE answers SET upvotes = (%s) WHERE answer_id = (%s);", (upvotes, answer_id,))
+                self.cursor.execute("UPDATE votes SET vote = (%s) WHERE v_username = (%s);", (1, username,))
             upvotes = upvotes + 1
             self.cursor.execute("UPDATE answers SET upvotes = (%s) WHERE answer_id = (%s);", (upvotes, answer_id,))
             if user_vote == 0:
@@ -135,7 +135,7 @@ class AnswersModel(object):
             downvotes = downvotes + 1
             self.cursor.execute("UPDATE answers SET downvotes = (%s) WHERE answer_id = (%s);", (downvotes, answer_id,))
             if user_vote == 0:
-                self.cursor.execute("INSERT INTO votes (a_id, v_username, vote) VALUES(%s, %s, %s);", (answer_id, username, 1))
+                self.cursor.execute("INSERT INTO votes (a_id, v_username, vote) VALUES(%s, %s, %s);", (answer_id, username, -1))
         self.conn.commit()
         self.conn.close()
         return dict(message="Thanks for contributing!")
