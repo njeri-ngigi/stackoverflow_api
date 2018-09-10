@@ -12,7 +12,7 @@ def create_app(config_name):
     os.environ["ENV"] = config_name
     from app.views import (Signup, Login, Logout, 
                            Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId)
-    from app.revoked_token_model import RevokedTokens
+    from app.models.revoked_token_model import RevokedTokens
     
     SetupDB(config_name)
 
