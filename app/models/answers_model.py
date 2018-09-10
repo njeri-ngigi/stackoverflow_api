@@ -27,7 +27,7 @@ class AnswersModel(object):
         result = self.cursor.fetchone()
         if not result:
             return False
-        return True
+        return result
         
     def post_answer(self,question_id, content, username):
         '''post an answer'''
@@ -102,9 +102,7 @@ class AnswersModel(object):
         if not result2:
             self.conn.close()
             return dict(message="This answer doesn't exist", error=404)
-        self.cursor.execute("SELECT a_username FROM answers WHERE answer_id = (%s);", (answer_id,))
-        result3 = self.cursor.fetchone()
-        if username == result3[0]:
+        if username == result2[3]:
             self.conn.close()
             return dict(message="You cannot vote on your own answer.", error=401)
         self.cursor.execute("SELECT vote FROM votes WHERE v_username = (%s)",(username,))
