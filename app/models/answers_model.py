@@ -56,7 +56,7 @@ class AnswersModel(object):
         return result2
 
     def update_or_accept_answer(self, question_id, answer_id, username, content, action):
-        '''Update answer'''
+        '''Update or accept answer'''
         result = self.check_if_question_exists(question_id)
         if not result:
             self.conn.close()
