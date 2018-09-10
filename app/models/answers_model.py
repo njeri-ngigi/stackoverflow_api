@@ -20,6 +20,14 @@ class AnswersModel(object):
         if not result:
             return False
         return True
+    
+    def check_if_answer_exists(self, answer_id):
+        'helper method to check if an answer exists'''
+        self.cursor.execute("SELECT * FROM answers WHERE answer_id = (%s);", (answer_id,))
+        result = self.cursor.fetchone()
+        if not result:
+            return False
+        return True
         
     def post_answer(self,question_id, content, username):
         '''post an answer'''
@@ -61,8 +69,7 @@ class AnswersModel(object):
         if not result:
             self.conn.close()
             return dict(message="Question doesn't exist", error=404)
-        self.cursor.execute("SELECT * FROM answers WHERE answer_id = (%s);", (answer_id,))
-        result2 = self.cursor.fetchone()
+        result2 = self.check_if_answer_exists(answer_id)
         if not result2:
             self.conn.close()
             return dict(message="This answer doesn't exist", error=404) 
@@ -84,4 +91,29 @@ class AnswersModel(object):
         self.conn.commit()
         self.conn.close()
         return dict(message="Answer #" + str(answer_id) + " accepted!")
+
+    def upvote_or_downvote(self, question_id, answer_id, vote):
+        '''upvote or downvote an answer'''
+        result = self.check_if_question_exists(question_id)
+        if not result:
+            self.conn.close()
+            return dict(message="Question doesn't exist", error=404)
+        result2 = self.check_if_answer_exists(answer_id)
+        if not result2:
+            self.conn.close()
+            return dict(message="This answer doesn't exist", error=404)
+        if vote == "upvote":
+            self.cursor.execute("SELECT upvotes FROM answers WHERE answer_id = (%s);", (answer_id,))
+            result3 = self.cursor.fetchone()
+            votes = result3[0] + 1
+            self.cursor.execute("UPDATE answers SET upvotes = (%s) WHERE answer_id = (%s);", (votes, answer_id,))
+        if vote == "downvote":
+            self.cursor.execute("SELECT downvotes FROM answers WHERE answer_id = (%s);", (answer_id,))
+            result3 = self.cursor.fetchone()
+            votes = result3[0] + 1
+            self.cursor.execute("UPDATE answers SET downvotes = (%s) WHERE answer_id = (%s);", (votes, answer_id,))
+        self.conn.close()
+        return dict(message="Thanks for contributing!")
+
+
         
