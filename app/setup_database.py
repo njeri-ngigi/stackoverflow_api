@@ -34,12 +34,14 @@ class SetupDB(object):
                 );''')
 
         cursor.execute('''CREATE TABLE IF NOT EXISTS answers(
-                answer_id  SERIAL NOT NULL,
-                q_id       INTEGER REFERENCES questions(question_id) ON DELETE CASCADE,
-                a_content  VARCHAR(200) NOT NULL,
-                a_username VARCHAR(20) NOT NULL,
-                accepted   INTEGER DEFAULT 0,
-                PRIMARY KEY (answer_id, q_id)
+                answer_id     SERIAL NOT NULL,
+                q_id          INTEGER REFERENCES questions(question_id) ON DELETE CASCADE,
+                a_content     VARCHAR(200) NOT NULL,
+                a_username    VARCHAR(20) NOT NULL,
+                accepted      INTEGER DEFAULT 0,
+                upvotes       INTEGER DEFAULT 0,
+                downvotes     INTEGER DEFAULT 0,
+                PRIMARY KEY   (answer_id, q_id)
                 );''')
 
         db_connection.commit()
