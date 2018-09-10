@@ -15,8 +15,8 @@ class TestingConfig(Config):
     '''configurations for testing with a separate test database'''
     TESTING = True
     DEBUG = True
-    CONNECTION_STRING = os.getenv('CONNECTION_STRING_TEST')
-   
+    CONNECTION_STRING = "dbname='test_db' user='postgres' host='localhost' password='testme'"
+    
 class ProductionConfig(Config):
     '''configurations for production'''
     DEBUG = False
