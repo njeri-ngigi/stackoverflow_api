@@ -46,7 +46,7 @@ def create_app(config_name):
     api.add_resource(QuestionsAnswers, '/api/v1/questions/<question_id>/answers')
     api.add_resource(QuestionsAnswersId, '/api/v1/questions/<question_id>/answers/<answer_id>')
     api.add_resource(QuestionsAnswersUpvote, '/api/v1/questions/<question_id>/answers/<answer_id>/upvote')
-    api.add_resource(QuestionsAnswersId, '/api/v1/questions/<question_id>/answers/<answer_id>/downvote')
+    api.add_resource(QuestionsAnswersDownvote, '/api/v1/questions/<question_id>/answers/<answer_id>/downvote')
     return app
 
 # Find out how too set environment name during runtime and retrieve it at runtimelike using os.get() something

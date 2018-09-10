@@ -150,8 +150,9 @@ class QuestionsAnswersUpvote(Resource):
         '''post method (upvote answer)'''
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
+        username = get_jwt_identity()
         my_answer = AnswersModel()
-        result = my_answer.upvote_or_downvote(q_id, a_id, "upvote")
+        result = my_answer.upvote_or_downvote(q_id, a_id, username, "upvote")
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200
@@ -164,11 +165,10 @@ class QuestionsAnswersDownvote(Resource):
         '''post method (downvote answer)'''
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
+        username = get_jwt_identity()
         my_answer = AnswersModel()
-        result = my_answer.upvote_or_downvote(q_id, a_id, "downvote")
+        result = my_answer.upvote_or_downvote(q_id, a_id, username, "downvote")
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200
-
-
         
