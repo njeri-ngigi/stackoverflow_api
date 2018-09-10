@@ -1,11 +1,11 @@
 '''instance/config.py'''
+import os
 
 class Config(object):
     '''parent config file'''
     DEBUG = True
-    SECRET_KEY = 'Sqklpeikvnjn!^Tghbvq8wij90!'
-    CONNECTION_STRING = "dbname='db_stackoverflow_lite' user='postgres' host='localhost' password='testme'"
-    # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:testme@localhost:5432/db_stackoverflow_lite'
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    CONNECTION_STRING = os.getenv('CONNECTION_STRING')
 
 class DevelopmentConfig(Config):
     '''configurations for development'''
@@ -15,9 +15,8 @@ class TestingConfig(Config):
     '''configurations for testing with a separate test database'''
     TESTING = True
     DEBUG = True
-    CONNECTION_STRING = "dbname='test_db' user='postgres' host='localhost' password='testme'"
-    # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:testme@localhost/test_db'
-
+    CONNECTION_STRING = os.getenv('CONNECTION_STRING_TEST')
+   
 class ProductionConfig(Config):
     '''configurations for production'''
     DEBUG = False
