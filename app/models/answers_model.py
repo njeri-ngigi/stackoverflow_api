@@ -20,6 +20,14 @@ class AnswersModel(object):
         if not result:
             return False
         return True
+    
+    def check_if_answer_exists(self, answer_id):
+        'helper method to check if an answer exists'''
+        self.cursor.execute("SELECT * FROM answers WHERE answer_id = (%s);", (answer_id,))
+        result = self.cursor.fetchone()
+        if not result:
+            return False
+        return result
         
     def post_answer(self,question_id, content, username):
         '''post an answer'''
@@ -61,8 +69,7 @@ class AnswersModel(object):
         if not result:
             self.conn.close()
             return dict(message="Question doesn't exist", error=404)
-        self.cursor.execute("SELECT * FROM answers WHERE answer_id = (%s);", (answer_id,))
-        result2 = self.cursor.fetchone()
+        result2 = self.check_if_answer_exists(answer_id)
         if not result2:
             self.conn.close()
             return dict(message="This answer doesn't exist", error=404) 
@@ -84,4 +91,51 @@ class AnswersModel(object):
         self.conn.commit()
         self.conn.close()
         return dict(message="Answer #" + str(answer_id) + " accepted!")
-        
+
+    def upvote_or_downvote(self, question_id, answer_id, username, vote):
+        '''upvote or downvote an answer'''
+        result = self.check_if_question_exists(question_id)
+        if not result:
+            self.conn.close()
+            return dict(message="Question doesn't exist", error=404)
+        result2 = self.check_if_answer_exists(answer_id)
+        if not result2:
+            self.conn.close()
+            return dict(message="This answer doesn't exist", error=404)
+        if username == result2[3]:
+            self.conn.close()
+            return dict(message="You cannot vote on your own answer.", error=401)
+        self.cursor.execute("SELECT vote FROM votes WHERE v_username = (%s)",(username,))
+        result4 = self.cursor.fetchone()
+        user_vote = 0
+        if result4:
+            user_vote = result4[0]
+        self.cursor.execute("SELECT upvotes FROM answers WHERE answer_id = (%s);", (answer_id,))
+        upvotes = self.cursor.fetchone()[0]
+        self.cursor.execute("SELECT downvotes FROM answers WHERE answer_id = (%s);", (answer_id,))
+        downvotes = self.cursor.fetchone()[0]
+        if vote == "upvote":
+            if user_vote == 1:
+                return dict(message="Upvote already noted.")
+            if user_vote == -1:
+                downvotes = downvotes - 1
+                self.cursor.execute("UPDATE answers SET downvotes = (%s) WHERE answer_id = (%s);", (downvotes, answer_id,))
+                self.cursor.execute("UPDATE votes SET vote = (%s) WHERE v_username = (%s);", (1, username,))
+            upvotes = upvotes + 1
+            self.cursor.execute("UPDATE answers SET upvotes = (%s) WHERE answer_id = (%s);", (upvotes, answer_id,))
+            if user_vote == 0:
+                self.cursor.execute("INSERT INTO votes (a_id, v_username, vote) VALUES(%s, %s, %s);", (answer_id, username, 1))
+        if vote == "downvote":
+            if user_vote == -1:
+                return dict(message="Downvote already noted.")
+            if user_vote == 1:
+                upvotes = upvotes - 1
+                self.cursor.execute("UPDATE answers SET upvotes = (%s) WHERE answer_id = (%s);", (upvotes, answer_id,))
+                self.cursor.execute("UPDATE votes SET vote = (%s) WHERE v_username = (%s);", (-1, username,))
+            downvotes = downvotes + 1
+            self.cursor.execute("UPDATE answers SET downvotes = (%s) WHERE answer_id = (%s);", (downvotes, answer_id,))
+            if user_vote == 0:
+                self.cursor.execute("INSERT INTO votes (a_id, v_username, vote) VALUES(%s, %s, %s);", (answer_id, username, -1))
+        self.conn.commit()
+        self.conn.close()
+        return dict(message="Thanks for contributing!")

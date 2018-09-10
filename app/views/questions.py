@@ -120,7 +120,7 @@ class QuestionsAnswersId(Resource):
     @classmethod
     @jwt_required
     def put(cls, question_id, answer_id):
-        '''put method'''
+        '''put method (edit or accept answer)'''
         data = request.get_json()
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
@@ -138,6 +138,36 @@ class QuestionsAnswersId(Resource):
             action = "update" 
         my_answer = AnswersModel()
         result = my_answer.update_or_accept_answer(q_id, a_id, username, content, action) 
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        return result, 200
+
+class QuestionsAnswersUpvote(Resource):
+    '''class represting upvoting an answer'''
+    @classmethod
+    @jwt_required
+    def post(cls, question_id, answer_id):
+        '''post method (upvote answer)'''
+        q_id = ast.literal_eval(question_id)
+        a_id = ast.literal_eval(answer_id)
+        username = get_jwt_identity()
+        my_answer = AnswersModel()
+        result = my_answer.upvote_or_downvote(q_id, a_id, username, "upvote")
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        return result, 200
+
+class QuestionsAnswersDownvote(Resource):
+    '''class represting downvoting an answer'''
+    @classmethod
+    @jwt_required
+    def post(cls, question_id, answer_id):
+        '''post method (downvote answer)'''
+        q_id = ast.literal_eval(question_id)
+        a_id = ast.literal_eval(answer_id)
+        username = get_jwt_identity()
+        my_answer = AnswersModel()
+        result = my_answer.upvote_or_downvote(q_id, a_id, username, "downvote")
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200
