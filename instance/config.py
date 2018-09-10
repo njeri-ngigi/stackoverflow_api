@@ -16,6 +16,7 @@ class TestingConfig(Config):
     TESTING = True
     DEBUG = True
     CONNECTION_STRING = "dbname='test_db' user='postgres' host='localhost' password='testme'"
+    SECRET_KEY = 'KjkhFDjihkgy#$&(hdsdsddR#$gdd!'
 
 class ProductionConfig(Config):
     '''configurations for production'''
