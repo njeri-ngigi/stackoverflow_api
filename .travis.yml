@@ -6,6 +6,10 @@ install:
  - pip install -r requirements.txt
  - pip install coveralls
  - pip install codeclimate-test-reporter
+services:
+ - postgresql
+before_script:
+ - createdb test_db
 script:	
  - nosetests tests --with-coverage
 after_success:

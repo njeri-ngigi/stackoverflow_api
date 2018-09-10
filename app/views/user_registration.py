@@ -2,10 +2,12 @@
 from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import (create_access_token, jwt_required, get_raw_jwt)
-from app.views.validate import Validate
-from app.models import User
 
-BLACKLIST = set()
+from app.views.validate import Validate
+from app.models.user_model import User
+from app.models.revoked_token_model import RevokedTokens
+
+from app.setup_database import SetupDB
 
 class Signup(Resource):
     '''Class representing user registration'''
@@ -48,7 +50,8 @@ class Login(Resource):
         password = data.get("password")
         if not username or not password:
             return dict(message="Username or password fields missing")
-        result = User.login(username, password)
+        my_user = User()
+        result = my_user.login(username, password)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         access_token = create_access_token(identity=username)
@@ -61,6 +64,7 @@ class Logout(Resource):
     def post(cls):
         '''post (logout) method'''
         json_token_identifier = get_raw_jwt()['jti']
-        BLACKLIST.add(json_token_identifier)
+        revoked_token = RevokedTokens()
+        revoked_token.add_token_to_blacklist(json_token_identifier)
         return dict(message="Leaving so soon?"), 200
         

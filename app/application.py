@@ -1,14 +1,20 @@
 '''app/application.py'''
+import os
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
 from instance.config import app_config
+from app.setup_database import SetupDB
 
 def create_app(config_name):
     '''function enclosing the Flask App'''
-    from app.views import (Signup, Login, Logout, BLACKLIST,
+    os.environ["ENV"] = config_name
+    from app.views import (Signup, Login, Logout, 
                            Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId)
+    from app.models.revoked_token_model import RevokedTokens
+    
+    SetupDB(config_name)
 
     app = Flask(__name__)
     api = Api(app)
@@ -26,7 +32,8 @@ def create_app(config_name):
     def _check_if_token_blacklist(decrypted_token):
         '''check if jti(unique identifier) is in BLACKLIST'''
         json_token_identifier = decrypted_token['jti']
-        return json_token_identifier in BLACKLIST
+        revoked_tokens = RevokedTokens()
+        return revoked_tokens.is_jti_blacklisted(json_token_identifier)
 
     #Add resources to routes
     api.add_resource(Signup, '/api/v1/auth/signup')
@@ -37,3 +44,5 @@ def create_app(config_name):
     api.add_resource(QuestionsAnswers, '/api/v1/questions/<question_id>/answers')
     api.add_resource(QuestionsAnswersId, '/api/v1/questions/<question_id>/answers/<answer_id>')
     return app
+
+# Find out how too set environment name during runtime and retrieve it at runtimelike using os.get() something
