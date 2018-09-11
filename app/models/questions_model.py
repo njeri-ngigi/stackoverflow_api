@@ -72,9 +72,13 @@ class QuestionsModel(object):
             return dict(message="Failed to delete question. Try again.")
         return dict(message="Question " + "#" + str(question_id) + " Deleted Successfully")
 
-    def get_all_user_questions(self, username):
+    def get_all_user_questions(self, username, limit=None):
         '''get all questions a user has ever asked'''
         self.cursor.execute("SELECT * FROM questions WHERE q_username = (%s);",(username,))
+        if limit:
+            result = self.cursor.fetchmany(limit)
+            self.conn.close()
+            return result
         result = self.cursor.fetchall()
         self.conn.close()
         return result

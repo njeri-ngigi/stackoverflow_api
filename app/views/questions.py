@@ -203,6 +203,7 @@ class AnswerComments(Resource):
     @classmethod
     @jwt_required
     def post(cls, question_id, answer_id):
+        '''post a comment'''
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
         username = get_jwt_identity()
@@ -223,3 +224,20 @@ class AnswerComments(Resource):
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 201
+
+    @classmethod
+    def get(cls, question_id, answer_id):
+        '''get all comments for an answer'''
+        limit = request.args.get('limit')
+        q_id = ast.literal_eval(question_id)
+        a_id = ast.literal_eval(answer_id)
+        if limit:
+            limit = ast.literal_eval(limit)
+        my_answer = AnswersModel()
+        result = my_answer.get_answer_comments(q_id, a_id, limit)
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        all_comments = []
+        for i in result:
+            all_comments.append({i[2]:i[3]})
+        return all_comments, 200
