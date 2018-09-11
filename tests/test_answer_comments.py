@@ -54,6 +54,11 @@ class TestQuestionAnswers(unittest.TestCase):
                            headers=dict(Authorization="Bearer " + self.a_token2),
                            content_type="application/json",
                            data=json.dumps({"content": "Sample answer 1"}))
+        #commenter posts a comment
+        self.client().post('/api/v1/questions/1/answers/1/comments',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "Sample comment"}))
 
     def test_post_answer(self):
         #test successful post comment
@@ -71,7 +76,7 @@ class TestQuestionAnswers(unittest.TestCase):
         #test posting the same comment more than once
         my_data2 = json.loads(result2.data)
         self.assertEqual(result2.status_code, 409)
-        self.assertEqual("Comment already noted. To edit comment visit question #1 answer #1 comment #1", my_data2["message"])
+        self.assertEqual("Comment already noted. To edit comment visit question #1 answer #1 comment #2", my_data2["message"])
         #test missing input
         result3 = self.client().post('/api/v1/questions/1/answers/1/comments',
                                      headers=dict(Authorization="Bearer " + self.a_token3),
@@ -146,7 +151,48 @@ class TestQuestionAnswers(unittest.TestCase):
         my_data4 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 200)
         self.assertEqual(len(my_data4), 2)
-        
+    
+    def test_update_comment(self):
+        #test successful update
+        result = self.client().put('/api/v1/questions/1/answers/1/comments/1',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "Sample updated comment"}))
+        my_data = json.loads(result.data)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual("Comment updated!", my_data["message"])
+        #test unauthorized update
+        result2 = self.client().put('/api/v1/questions/1/answers/1/comments/1',
+                                    headers=dict(Authorization="Bearer " + self.a_token),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "Sample updated comment"}))
+        my_data2 = json.loads(result2.data)
+        self.assertEqual(result2.status_code, 401)
+        self.assertEqual("Unauthorized to edit this comment.", my_data2["message"])
+        #test non-existent question
+        result3 = self.client().put('/api/v1/questions/20/answers/1/comments/1',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "Sample updated comment"}))
+        my_data3 = json.loads(result3.data)
+        self.assertEqual(result3.status_code, 404)
+        self.assertEqual("Question doesn't exist", my_data3["message"])
+        #test non-existent answer
+        result4 = self.client().put('/api/v1/questions/1/answers/20/comments/1',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "Sample updated comment"}))
+        my_data4 = json.loads(result4.data)
+        self.assertEqual(result4.status_code, 404)
+        self.assertEqual("This answer doesn't exist", my_data4["message"])
+        #test non-existent comment
+        result5 = self.client().put('/api/v1/questions/1/answers/1/comments/10',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "Sample updated comment"}))
+        my_data5 = json.loads(result5.data)
+        self.assertEqual(result5.status_code, 404)
+        self.assertEqual("Comment doesn't exist", my_data5["message"])
 
     def tearDown(self):
         current_environemt = os.environ['ENV']
