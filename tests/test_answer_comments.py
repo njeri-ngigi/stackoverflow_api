@@ -112,6 +112,41 @@ class TestQuestionAnswers(unittest.TestCase):
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 404)
         self.assertEqual("This answer doesn't exist", my_data7["message"])
+    
+    def test_get_answer_comments(self):
+        #test successful fetch
+        result = self.client().get('/api/v1/questions/1/answers/1/comments')
+        my_data = json.loads(result.data)
+        self.assertEqual(result.status_code, 200)
+        self.assertGreaterEqual(len(my_data), 0)
+        #test non-existent question
+        result2 = self.client().get('/api/v1/questions/10/answers/1/comments')
+        my_data2 = json.loads(result2.data)
+        self.assertEqual(result2.status_code, 404)
+        self.assertEqual("Question doesn't exist", my_data2["message"])
+        #test non-existent answer
+        result3 = self.client().get('/api/v1/questions/1/answers/10/comments')
+        my_data3 = json.loads(result3.data)
+        self.assertEqual(result3.status_code, 404)
+        self.assertEqual("This answer doesn't exist", my_data3["message"])
+        #test limit
+        self.client().post('/api/v1/questions/1/answers/1/comments',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "Sample comment2"}))
+        self.client().post('/api/v1/questions/1/answers/1/comments',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "Sample comment3"}))
+        self.client().post('/api/v1/questions/1/answers/1/comments',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "Sample comment1"}))
+        result4 = self.client().get('/api/v1/questions/1/answers/1/comments?limit=2')
+        my_data4 = json.loads(result4.data)
+        self.assertEqual(result4.status_code, 200)
+        self.assertEqual(len(my_data4), 2)
+        
 
     def tearDown(self):
         current_environemt = os.environ['ENV']
