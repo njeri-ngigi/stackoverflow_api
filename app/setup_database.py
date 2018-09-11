@@ -42,6 +42,7 @@ class SetupDB(object):
                 accepted      INTEGER DEFAULT 0,
                 upvotes       INTEGER DEFAULT 0,
                 downvotes     INTEGER DEFAULT 0,
+                comments      INTEGER DEFAULT 0,
                 PRIMARY KEY   (answer_id, q_id)
                 );''')
 
