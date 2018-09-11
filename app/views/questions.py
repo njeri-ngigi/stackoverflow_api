@@ -243,10 +243,11 @@ class AnswerComments(Resource):
         return all_comments, 200
     
 class AnswerCommentsId(Resource):
-    '''class representing comment actions'''
+    '''class representing update comment'''
     @classmethod
     @jwt_required
     def put(self, question_id, answer_id, comments_id):
+        '''update comment'''
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
         c_id = ast.literal_eval(comments_id)
@@ -262,6 +263,31 @@ class AnswerCommentsId(Resource):
             return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
         my_answer = AnswersModel()
         result = my_answer.update_comment(q_id, a_id, c_id, username, content)
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        return result, 200
+
+class SearchQuestion(Resource):
+    '''class representing search question'''
+    @classmethod
+    def post(self):
+        '''search question'''
+        limit = request.args.get('limit')
+        if not limit:
+            return dict(message="Enter a limit to search through"), 400
+        limit = ast.literal_eval(limit)
+        data = request.get_json()
+        if not data:
+            return dict(message="Field cannot be empty"), 400
+        content = data.get("content")
+        if not content:
+            return dict(message="Please enter content"), 400
+        content = content.strip()
+        if not content:
+            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+        
+        my_question = QuestionsModel()
+        result = my_question.search_question(content, limit)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200

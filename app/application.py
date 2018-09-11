@@ -13,7 +13,7 @@ def create_app(config_name):
     from app.views import (Signup, Login, Logout, 
                            Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId,
                            QuestionsAnswersUpvote, QuestionsAnswersDownvote, UserQuestions, AnswerComments,
-                           AnswerCommentsId)
+                           AnswerCommentsId, SearchQuestion)
     from app.models.revoked_token_model import RevokedTokens
     
     SetupDB(config_name)
@@ -51,4 +51,5 @@ def create_app(config_name):
     api.add_resource(UserQuestions, '/api/v1/users/questions')
     api.add_resource(AnswerComments, '/api/v1/questions/<question_id>/answers/<answer_id>/comments')
     api.add_resource(AnswerCommentsId, '/api/v1/questions/<question_id>/answers/<answer_id>/comments/<comments_id>')
+    api.add_resource(SearchQuestion, '/api/v1/questions/search')
     return app

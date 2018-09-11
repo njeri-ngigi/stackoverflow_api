@@ -2,6 +2,7 @@
 import os
 import psycopg2
 from difflib import get_close_matches
+from itertools import chain
 from instance.config import app_config
 
 CURRENT_ENVIRONMENT = os.environ['ENV']
@@ -96,12 +97,16 @@ class QuestionsModel(object):
 
     def search_question(self, title, limit):
         '''search question by title'''
+        self.cursor.execute("SELECT question_id, q_title FROM questions WHERE q_title = (%s);", (title,))
+        result = self.cursor.fetchone()
+        if result:
+            self.conn.close()
+            return dict(question_id=result[0], title=result[1])
         self.cursor.execute("SELECT q_title FROM questions")
         result = self.cursor.fetchmany(limit)
-        flattened_list = []
-        for i in result:
-            flattened_list.append(i[0])
+        flattened_list = list(chain.from_iterable(result))
         search_result = get_close_matches(title, flattened_list)
         self.conn.close()
+        if not search_result:
+            return dict(message="No matches. Be the first to ask the question?", error=404)
         return search_result
-
