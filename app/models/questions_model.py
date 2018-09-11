@@ -83,7 +83,7 @@ class QuestionsModel(object):
         self.conn.close()
         return result
 
-    def get_question_most_answer(self, limit=None):
+    def get_question_most_answers(self, limit=None):
         '''get questions with most answers'''
         self.cursor.execute("SELECT * FROM questions ORDER BY q_answers DESC")
         if limit:

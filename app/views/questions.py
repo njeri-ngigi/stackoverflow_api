@@ -241,3 +241,27 @@ class AnswerComments(Resource):
         for i in result:
             all_comments.append({i[2]:i[3]})
         return all_comments, 200
+    
+class AnswerCommentsId(Resource):
+    '''class representing comment actions'''
+    @classmethod
+    @jwt_required
+    def put(self, question_id, answer_id, comments_id):
+        q_id = ast.literal_eval(question_id)
+        a_id = ast.literal_eval(answer_id)
+        c_id = ast.literal_eval(comments_id)
+        username = get_jwt_identity()
+        data = request.get_json()
+        if not data:
+            return dict(message="Field cannot be empty"), 400
+        content = data.get("content")
+        if not content:
+            return dict(message="Please enter content"), 400
+        content = content.strip()
+        if not content:
+            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+        my_answer = AnswersModel()
+        result = my_answer.update_comment(q_id, a_id, c_id, username, content)
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        return result, 200
