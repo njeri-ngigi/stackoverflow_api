@@ -136,6 +136,6 @@ class TestQuestions(unittest.TestCase):
         conn_string = app_config[current_environemt].CONNECTION_STRING
         conn = psycopg2.connect(conn_string)
         cursor = conn.cursor()
-        cursor.execute("DROP TABLE votes, answers, questions, revoked_tokens, users")
+        cursor.execute("DROP TABLE votes, comments, answers, questions, revoked_tokens, users")
         conn.commit()
         conn.close()
