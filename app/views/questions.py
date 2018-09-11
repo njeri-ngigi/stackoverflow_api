@@ -12,8 +12,9 @@ class Questions(Resource):
     @classmethod
     def get(cls):
         '''get all questions'''
+        limit = request.args.get('limit')
         my_question = QuestionsModel()
-        result = my_question.get_all_questions()
+        result = my_question.get_all_questions(limit)
         if not result:
             return result, 200
         all_questions = []
@@ -100,9 +101,11 @@ class QuestionsAnswers(Resource):
 
     @classmethod
     def get(cls, question_id):
+        '''get all answers to a question'''
+        limit = request.args.get('limit')
         q_id = ast.literal_eval(question_id)
         my_answer = AnswersModel()
-        result = my_answer.get_all_answers_to_question(q_id)
+        result = my_answer.get_all_answers_to_question(q_id, limit)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         if "message" in result:
@@ -171,4 +174,19 @@ class QuestionsAnswersDownvote(Resource):
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200
-        
+    
+class UserQuestions(Resource):
+    '''class representing get all user questions'''
+    @classmethod
+    @jwt_required
+    def get(cls):
+        username = get_jwt_identity()
+        my_question = QuestionsModel()
+        result = my_question.get_all_user_questions(username)
+        if not result:
+            return dict(message="Sorry, no questions here at the moment"), 404
+        all_questions = []    
+        for i in result:
+            question={"question_id":i[0], "title":i[1], "content":i[2], "answers":i[4]}
+            all_questions.append(question)
+        return all_questions, 200
