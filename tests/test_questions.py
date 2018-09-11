@@ -149,7 +149,37 @@ class TestQuestions(unittest.TestCase):
                                        headers=dict(Authorization="Bearer " + self.a_token2))
         my_data2 = json.loads(result2.data)
         self.assertEqual(len(my_data2), 1)
-        self.assertEqual(result2.status_code, 200) 
+        self.assertEqual(result2.status_code, 200)
+    
+    def test_search_question(self):
+        #successfull serach by title
+        result = self.client().post('/api/v1/questions/search?limit=10',
+                                    content_type="application/json",
+                                    data=json.dumps({"content":"Git branching"}))
+        my_data = json.loads(result.data)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual("Git branching", my_data["title"])
+        #successful search return closest matches
+        result2 = self.client().post('/api/v1/questions/search?limit=10',
+                                     content_type="application/json",
+                                     data=json.dumps({"content":"git branch"}))
+        my_data2 = json.loads(result2.data)
+        self.assertEqual(result2.status_code, 200)
+        self.assertGreater(len(my_data2), 0)
+        #test search without set limit
+        result3 = self.client().post('/api/v1/questions/search',
+                                     content_type="application/json",
+                                     data=json.dumps({"content":"git branch"}))
+        my_data3 = json.loads(result3.data)
+        self.assertEqual(result3.status_code, 400)
+        self.assertEqual("Enter a limit to search through", my_data3["message"])
+        #test no match found
+        result4 = self.client().post('/api/v1/questions/search?limit=10',
+                                     content_type="application/json",
+                                     data=json.dumps({"content":"just in time"}))
+        my_data4 = json.loads(result4.data)
+        self.assertEqual(result4.status_code, 404)
+        self.assertEqual("No matches. Be the first to ask the question?", my_data4["message"])
 
     def tearDown(self):
         current_environemt = os.environ['ENV']
