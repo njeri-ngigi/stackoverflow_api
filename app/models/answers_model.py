@@ -160,18 +160,18 @@ class AnswersModel(object):
         if not result:
             self.conn.close()
             return dict(message="This answer doesn't exist", error=404)
-        self.cursor.execute("SELECT * FROM comment WHERE c_username = (%s) AND c_content = (%s);", (username, content,))
+        self.cursor.execute("SELECT * FROM comments WHERE c_username = (%s) AND c_content = (%s);", (username, content,))
         result2 = self.cursor.fetchone()
         if result2:
             self.conn.close()
             return dict(message="Comment already noted. To edit comment visit question #" +
                         str(question_id) + " answer #" + str(answer_id) + " comment #" + str(result2[0]),
-                        question_id=question_id, answer_id=answer_id, error=409)
+                        question_id=question_id, answer_id=answer_id, comment_id=result2[0], error=409)
         sql = "INSERT INTO comments (a_id, c_username, c_content) VALUES (%s, %s, %s);"
         self.cursor.execute(sql, (answer_id, username, content))
         comments = result[7]
         comments = comments + 1
-        self.cursor.execute("UPDATE answers SET a_comment = (%s) WHERE answer_id = (%s);", (comments, answer_id))
+        self.cursor.execute("UPDATE answers SET comments = (%s) WHERE answer_id = (%s);", (comments, answer_id))
         self.conn.commit()
         self.conn.close()
         return dict(message="Comment posted!")
