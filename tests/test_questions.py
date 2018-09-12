@@ -87,24 +87,31 @@ class TestQuestions(unittest.TestCase):
         my_data = json.loads(result.data)
         self.assertGreaterEqual(len(my_data), 0)
         self.assertEqual(result.status_code, 200)
-
         #test get single question
         result2 = self.client().get('/api/v1/questions/1')
         my_data2 = json.loads(result2.data)
         self.assertEqual("Git branching", my_data2["title"])
         self.assertEqual(result2.status_code, 200)
-
         #test missing question
         result3 = self.client().get('/api/v1/questions/10')
         my_data3 = json.loads(result3.data)
         self.assertEqual("Question doesn't exist", my_data3["message"])
         self.assertEqual(result3.status_code, 404)
-
         #test limit
         result4 = self.client().get('/api/v1/questions?limit=1')
         my_data4 = json.loads(result4.data)
         self.assertEqual(len(my_data4), 1)
         self.assertEqual(result4.status_code, 200)
+        #test get questions with most answers with limit
+        result5 = self.client().get('/api/v1/questions?limit=1&query="most_answers"')
+        my_data5 = json.loads(result5.data)
+        self.assertEqual(len(my_data5), 1)
+        self.assertEqual(result5.status_code, 200)
+        #test get questions with most answers
+        result6 = self.client().get('/api/v1/questions?query="most_answers"')
+        my_data6 = json.loads(result6.data)
+        self.assertGreaterEqual(len(my_data6), 0)
+        self.assertEqual(result6.status_code, 200)
 
     def test_delete_questions(self):
         '''test deleting questions'''
