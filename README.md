@@ -29,9 +29,10 @@ The api provides endpoints for signup, login, logout, retrieve all or a single q
 ## Prerequisites
       pip
       virtualenv
-      python 3 or python 2.7
-      
-
+      python 3
+      postgresql
+## Setting up database
+      Open Postgres PgAdmin and create 2 databases test_db and db_stackoverflow_lite
 ## Installation
    clone repo:
    ```
@@ -53,8 +54,6 @@ The api provides endpoints for signup, login, logout, retrieve all or a single q
    ```
    $python run.py
    ```
-      
-
 ## Running the tests
   The tests for this API are written using the python module unittests. The tests are found in the folder tests.
   Use nose to run the tests.<br>
