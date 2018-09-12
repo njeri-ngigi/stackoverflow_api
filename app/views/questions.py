@@ -15,8 +15,12 @@ class Questions(Resource):
         limit = request.args.get('limit')
         if limit:
             limit = ast.literal_eval(limit)
+        query = request.args.get('query')
         my_question = QuestionsModel()
-        result = my_question.get_all_questions(limit)
+        if query == "most_questions":
+            result = my_question.get_question_most_answers(limit)
+        else:
+            result = my_question.get_all_questions(limit)
         if not result:
             return result, 200
         all_questions = []
