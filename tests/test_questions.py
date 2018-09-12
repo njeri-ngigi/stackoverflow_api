@@ -186,8 +186,8 @@ class TestQuestions(unittest.TestCase):
         result3 = self.client().get('/api/v1/users/questions?limit=1',
                                        headers=dict(Authorization="Bearer " + self.a_token3))
         my_data3 = json.loads(result3.data)
-        self.assertEqual(result3.status_code, 404)
-        self.assertEqual("No questions here at the moment. Ask a question?", my_data3["message"])
+        self.assertEqual(result3.status_code, 200)
+        self.assertEqual(len(my_data3), 0)
 
     def test_search_question(self):
         #successfull serach by title

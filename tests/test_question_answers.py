@@ -127,7 +127,7 @@ class TestQuestionAnswers(unittest.TestCase):
         result2 = self.client().get('/api/v1/questions/3/answers')
         my_data2 = json.loads(result2.data)
         self.assertEqual(result2.status_code, 200)
-        self.assertEqual("No answers at the moment", my_data2["message"])
+        self.assertEqual(len(my_data2), 0)
         #non-existent question
         result3 = self.client().get('/api/v1/questions/31/answers')
         my_data3 = json.loads(result3.data)

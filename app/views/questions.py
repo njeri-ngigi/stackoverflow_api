@@ -116,8 +116,6 @@ class QuestionsAnswers(Resource):
         result = my_answer.get_all_answers_to_question(q_id, limit)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
-        if "message" in result:
-            return result, 200
         all_answers = []
         for i in result:
             answer = {i[3]:i[2]}
@@ -194,8 +192,6 @@ class UserQuestions(Resource):
         username = get_jwt_identity()
         my_question = QuestionsModel()
         result = my_question.get_all_user_questions(username, limit)
-        if not result:
-            return dict(message="No questions here at the moment. Ask a question?"), 404
         all_questions = []    
         for i in result:
             question={"question_id":i[0], "title":i[1], "content":i[2], "answers":i[4]}

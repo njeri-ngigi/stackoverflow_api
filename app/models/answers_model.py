@@ -69,8 +69,6 @@ class AnswersModel(object):
             return result2
         result2 = self.cursor.fetchall()
         self.conn.close()
-        if not result2:
-            return dict(message="No answers at the moment")
         return result2
 
     def update_or_accept_answer(self, question_id, answer_id, username, content, action):
