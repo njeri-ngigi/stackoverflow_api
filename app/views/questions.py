@@ -12,13 +12,20 @@ class Questions(Resource):
     @classmethod
     def get(cls):
         '''get all questions'''
+        limit = request.args.get('limit')
+        if limit:
+            limit = ast.literal_eval(limit)
+        query = request.args.get('query')
         my_question = QuestionsModel()
-        result = my_question.get_all_questions()
+        if query == "most_answers":
+            result = my_question.get_question_most_answers(limit)
+        else:
+            result = my_question.get_all_questions(limit)
         if not result:
             return result, 200
         all_questions = []
         for i in result:
-            question = dict(id=i[0], title=i[1], content=i[2], username=i[3])
+            question = dict(id=i[0], title=i[1], content=i[2], username=i[3], answers_given=i[5])
             all_questions.append(question)
         return all_questions, 200
 
@@ -100,13 +107,15 @@ class QuestionsAnswers(Resource):
 
     @classmethod
     def get(cls, question_id):
+        '''get all answers to a question'''
+        limit = request.args.get('limit')
+        if limit:
+            limit = ast.literal_eval(limit)
         q_id = ast.literal_eval(question_id)
         my_answer = AnswersModel()
-        result = my_answer.get_all_answers_to_question(q_id)
+        result = my_answer.get_all_answers_to_question(q_id, limit)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
-        if "message" in result:
-            return result, 200
         all_answers = []
         for i in result:
             answer = {i[3]:i[2]}
@@ -171,4 +180,114 @@ class QuestionsAnswersDownvote(Resource):
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200
+    
+class UserQuestions(Resource):
+    '''class representing get all user questions'''
+    @classmethod
+    @jwt_required
+    def get(cls):
+        limit = request.args.get('limit')
+        if limit:
+            limit = ast.literal_eval(limit)
+        username = get_jwt_identity()
+        my_question = QuestionsModel()
+        result = my_question.get_all_user_questions(username, limit)
+        all_questions = []    
+        for i in result:
+            question={"question_id":i[0], "title":i[1], "content":i[2], "answers":i[4]}
+            all_questions.append(question)
+        return all_questions, 200
+
+class AnswerComments(Resource):
+    '''class representing comment actions'''
+    @classmethod
+    @jwt_required
+    def post(cls, question_id, answer_id):
+        '''post a comment'''
+        q_id = ast.literal_eval(question_id)
+        a_id = ast.literal_eval(answer_id)
+        username = get_jwt_identity()
+        data = request.get_json()
+        if not data:
+            return dict(message="Field cannot be empty"), 400
+        content = data.get("content")
+        if not content:
+            return dict(message="Please enter content"), 400
+        content = content.strip()
+        if not content:
+            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+        my_answer = AnswersModel()
+        result = my_answer.post_comment(q_id, a_id, username, content)
+        if "question_id" in result:
+            return dict(message=result["message"], question_id=result["question_id"],
+                        answer_id=result["answer_id"], comment_id=result["comment_id"]), result["error"]
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        return result, 201
+
+    @classmethod
+    def get(cls, question_id, answer_id):
+        '''get all comments for an answer'''
+        limit = request.args.get('limit')
+        q_id = ast.literal_eval(question_id)
+        a_id = ast.literal_eval(answer_id)
+        if limit:
+            limit = ast.literal_eval(limit)
+        my_answer = AnswersModel()
+        result = my_answer.get_answer_comments(q_id, a_id, limit)
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        all_comments = []
+        for i in result:
+            all_comments.append({i[2]:i[3]})
+        return all_comments, 200
+    
+class AnswerCommentsId(Resource):
+    '''class representing update comment'''
+    @classmethod
+    @jwt_required
+    def put(self, question_id, answer_id, comments_id):
+        '''update comment'''
+        q_id = ast.literal_eval(question_id)
+        a_id = ast.literal_eval(answer_id)
+        c_id = ast.literal_eval(comments_id)
+        username = get_jwt_identity()
+        data = request.get_json()
+        if not data:
+            return dict(message="Field cannot be empty"), 400
+        content = data.get("content")
+        if not content:
+            return dict(message="Please enter content"), 400
+        content = content.strip()
+        if not content:
+            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+        my_answer = AnswersModel()
+        result = my_answer.update_comment(q_id, a_id, c_id, username, content)
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        return result, 200
+
+class SearchQuestion(Resource):
+    '''class representing search question'''
+    @classmethod
+    def post(self):
+        '''search question'''
+        limit = request.args.get('limit')
+        if not limit:
+            return dict(message="Enter a limit to search through"), 400
+        limit = ast.literal_eval(limit)
+        data = request.get_json()
+        if not data:
+            return dict(message="Field cannot be empty"), 400
+        content = data.get("content")
+        if not content:
+            return dict(message="Please enter content"), 400
+        content = content.strip()
+        if not content:
+            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
         
+        my_question = QuestionsModel()
+        result = my_question.search_question(content, limit)
+        if "error" in result:
+            return dict(message=result["message"]), result["error"]
+        return result, 200

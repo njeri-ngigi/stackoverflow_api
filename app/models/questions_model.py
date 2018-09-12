@@ -1,6 +1,8 @@
 '''app/models/questions_model.py'''
 import os
 import psycopg2
+from difflib import get_close_matches
+from itertools import chain
 from instance.config import app_config
 
 CURRENT_ENVIRONMENT = os.environ['ENV']
@@ -31,9 +33,13 @@ class QuestionsModel(object):
             return dict(message="Failed to add question. Try again.", error=404)
         return dict(title=title)
 
-    def get_all_questions(self):
+    def get_all_questions(self, limit=None):
         '''get all questions'''
         self.cursor.execute("SELECT * FROM questions")
+        if limit:
+            result = self.cursor.fetchmany(limit)
+            self.conn.close()
+            return result
         result = self.cursor.fetchall()
         self.conn.close()
         return result
@@ -66,3 +72,41 @@ class QuestionsModel(object):
         if result2:
             return dict(message="Failed to delete question. Try again.")
         return dict(message="Question " + "#" + str(question_id) + " Deleted Successfully")
+
+    def get_all_user_questions(self, username, limit=None):
+        '''get all questions a user has ever asked'''
+        self.cursor.execute("SELECT * FROM questions WHERE q_username = (%s);",(username,))
+        if limit:
+            result = self.cursor.fetchmany(limit)
+            self.conn.close()
+            return result
+        result = self.cursor.fetchall()
+        self.conn.close()
+        return result
+
+    def get_question_most_answers(self, limit=None):
+        '''get questions with most answers'''
+        self.cursor.execute("SELECT * FROM questions ORDER BY q_answers DESC")
+        if limit:
+            result = self.cursor.fetchmany(limit)
+            self.conn.close()
+            return result
+        result = self.cursor.fetchall()
+        self.conn.close()
+        return result
+
+    def search_question(self, title, limit):
+        '''search question by title'''
+        self.cursor.execute("SELECT question_id, q_title FROM questions WHERE q_title = (%s);", (title,))
+        result = self.cursor.fetchone()
+        if result:
+            self.conn.close()
+            return dict(question_id=result[0], title=result[1])
+        self.cursor.execute("SELECT q_title FROM questions")
+        result = self.cursor.fetchmany(limit)
+        flattened_list = list(chain.from_iterable(result))
+        search_result = get_close_matches(title, flattened_list, n=15)
+        self.conn.close()
+        if not search_result:
+            return dict(message="No matches. Be the first to ask the question?", error=404)
+        return search_result

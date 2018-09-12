@@ -45,22 +45,30 @@ class AnswersModel(object):
         sql = "INSERT INTO answers (q_id, a_content, a_username) VALUES (%s, %s, %s) RETURNING answer_id;"
         self.cursor.execute(sql,(question_id, content, username))
         a_id = self.cursor.fetchone()[0]
+        if not a_id:
+            self.conn.close()
+            return dict(message="Failed to post answer. Try again.", error=404)
+        self.cursor.execute("SELECT q_answers FROM questions WHERE question_id = (%s);",(question_id,))
+        q_answers = self.cursor.fetchone()[0]
+        q_answers = q_answers + 1
+        self.cursor.execute("UPDATE questions SET q_answers = (%s) WHERE question_id = (%s);", (q_answers, question_id,))
         self.conn.commit()
         self.conn.close()
-        if not a_id:
-            return dict(message="Failed to post answer. Try again.", error=404)
         return dict(message="Answer Posted!")
 
-    def get_all_answers_to_question(self, question_id):
+    def get_all_answers_to_question(self, question_id, limit=None):
         '''get all answers to a question'''
         result = self.check_if_question_exists(question_id)
         if not result:
             self.conn.close()
             return dict(message="Question doesn't exist", error=404)
         self.cursor.execute("SELECT * FROM answers WHERE q_id = (%s) ORDER BY accepted DESC;", (question_id,))
+        if limit:
+            result2 = self.cursor.fetchmany(limit)
+            self.conn.close()
+            return result2
         result2 = self.cursor.fetchall()
-        if not result2:
-            return dict(message="No answers at the moment")
+        self.conn.close()
         return result2
 
     def update_or_accept_answer(self, question_id, answer_id, username, content, action):
@@ -139,3 +147,71 @@ class AnswersModel(object):
         self.conn.commit()
         self.conn.close()
         return dict(message="Thanks for contributing!")
+
+    def post_comment(self, question_id, answer_id, username, content):
+        '''post comment on answer'''
+        result = self.check_if_question_exists(question_id)
+        if not result:
+            self.conn.close()
+            return dict(message="Question doesn't exist", error=404)
+        result = self.check_if_answer_exists(answer_id)
+        if not result:
+            self.conn.close()
+            return dict(message="This answer doesn't exist", error=404)
+        self.cursor.execute("SELECT * FROM comments WHERE c_username = (%s) AND c_content = (%s);", (username, content,))
+        result2 = self.cursor.fetchone()
+        if result2:
+            self.conn.close()
+            return dict(message="Comment already noted. To edit comment visit question #" +
+                        str(question_id) + " answer #" + str(answer_id) + " comment #" + str(result2[0]),
+                        question_id=question_id, answer_id=answer_id, comment_id=result2[0], error=409)
+        sql = "INSERT INTO comments (a_id, c_username, c_content) VALUES (%s, %s, %s);"
+        self.cursor.execute(sql, (answer_id, username, content))
+        comments = result[7]
+        comments = comments + 1
+        self.cursor.execute("UPDATE answers SET comments = (%s) WHERE answer_id = (%s);", (comments, answer_id))
+        self.conn.commit()
+        self.conn.close()
+        return dict(message="Comment posted!")
+
+    def get_answer_comments(self, question_id, answer_id, limit=None):
+        '''get all comments for an answer'''
+        result = self.check_if_question_exists(question_id)
+        if not result:
+            self.conn.close()
+            return dict(message="Question doesn't exist", error=404)
+        result = self.check_if_answer_exists(answer_id)
+        if not result:
+            self.conn.close()
+            return dict(message="This answer doesn't exist", error=404)
+        self.cursor.execute("SELECT * FROM comments WHERE a_id = (%s);", (answer_id,)) 
+        if limit:
+            result2 = self.cursor.fetchmany(limit)
+            self.conn.close()
+            return result2
+        result2 = self.cursor.fetchall()
+        self.conn.close()
+        return result2
+
+    def update_comment(self, question_id, answer_id, comment_id, username, content):
+        '''update a comment on an answer'''
+        result = self.check_if_question_exists(question_id)
+        if not result:
+            self.conn.close()
+            return dict(message="Question doesn't exist", error=404)
+        result = self.check_if_answer_exists(answer_id)
+        if not result:
+            self.conn.close()
+            return dict(message="This answer doesn't exist", error=404)
+        self.cursor.execute("SELECT c_username FROM comments WHERE comment_id = (%s);", (comment_id,)) 
+        result = self.cursor.fetchone()
+        if not result:
+            self.conn.close()
+            return dict(message="Comment doesn't exist", error=404)
+        if result[0] != username:
+            self.conn.close()
+            return dict(message="Unauthorized to edit this comment.", error=401)
+        self.cursor.execute("UPDATE comments SET c_content = (%s) WHERE comment_id = (%s);", (content, comment_id))
+        self.conn.commit()
+        self.conn.close()
+        return dict(message="Comment updated!")

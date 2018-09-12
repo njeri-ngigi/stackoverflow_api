@@ -12,7 +12,8 @@ def create_app(config_name):
     os.environ["ENV"] = config_name
     from app.views import (Signup, Login, Logout, 
                            Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId,
-                           QuestionsAnswersUpvote, QuestionsAnswersDownvote)
+                           QuestionsAnswersUpvote, QuestionsAnswersDownvote, UserQuestions, AnswerComments,
+                           AnswerCommentsId, SearchQuestion)
     from app.models.revoked_token_model import RevokedTokens
     
     SetupDB(config_name)
@@ -47,6 +48,8 @@ def create_app(config_name):
     api.add_resource(QuestionsAnswersId, '/api/v1/questions/<question_id>/answers/<answer_id>')
     api.add_resource(QuestionsAnswersUpvote, '/api/v1/questions/<question_id>/answers/<answer_id>/upvote')
     api.add_resource(QuestionsAnswersDownvote, '/api/v1/questions/<question_id>/answers/<answer_id>/downvote')
+    api.add_resource(UserQuestions, '/api/v1/users/questions')
+    api.add_resource(AnswerComments, '/api/v1/questions/<question_id>/answers/<answer_id>/comments')
+    api.add_resource(AnswerCommentsId, '/api/v1/questions/<question_id>/answers/<answer_id>/comments/<comments_id>')
+    api.add_resource(SearchQuestion, '/api/v1/questions/search')
     return app
-
-# Find out how too set environment name during runtime and retrieve it at runtimelike using os.get() something
