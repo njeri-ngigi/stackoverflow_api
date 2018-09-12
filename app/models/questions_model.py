@@ -105,7 +105,7 @@ class QuestionsModel(object):
         self.cursor.execute("SELECT q_title FROM questions")
         result = self.cursor.fetchmany(limit)
         flattened_list = list(chain.from_iterable(result))
-        search_result = get_close_matches(title, flattened_list)
+        search_result = get_close_matches(title, flattened_list, n=15)
         self.conn.close()
         if not search_result:
             return dict(message="No matches. Be the first to ask the question?", error=404)

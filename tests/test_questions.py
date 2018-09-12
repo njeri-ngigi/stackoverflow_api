@@ -103,12 +103,12 @@ class TestQuestions(unittest.TestCase):
         self.assertEqual(len(my_data4), 1)
         self.assertEqual(result4.status_code, 200)
         #test get questions with most answers with limit
-        result5 = self.client().get('/api/v1/questions?limit=1&query="most_answers"')
+        result5 = self.client().get('/api/v1/questions?limit=1&query=most_answers')
         my_data5 = json.loads(result5.data)
         self.assertEqual(len(my_data5), 1)
         self.assertEqual(result5.status_code, 200)
         #test get questions with most answers
-        result6 = self.client().get('/api/v1/questions?query="most_answers"')
+        result6 = self.client().get('/api/v1/questions?query=most_answers')
         my_data6 = json.loads(result6.data)
         self.assertGreaterEqual(len(my_data6), 0)
         self.assertEqual(result6.status_code, 200)

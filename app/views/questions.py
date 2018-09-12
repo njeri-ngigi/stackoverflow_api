@@ -17,7 +17,7 @@ class Questions(Resource):
             limit = ast.literal_eval(limit)
         query = request.args.get('query')
         my_question = QuestionsModel()
-        if query == "most_questions":
+        if query == "most_answers":
             result = my_question.get_question_most_answers(limit)
         else:
             result = my_question.get_all_questions(limit)
@@ -25,7 +25,7 @@ class Questions(Resource):
             return result, 200
         all_questions = []
         for i in result:
-            question = dict(id=i[0], title=i[1], content=i[2], username=i[3])
+            question = dict(id=i[0], title=i[1], content=i[2], username=i[3], answers_given=i[5])
             all_questions.append(question)
         return all_questions, 200
 
