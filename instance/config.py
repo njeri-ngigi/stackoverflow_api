@@ -1,19 +1,30 @@
 '''instance/config.py'''
+import os
+
 class Config(object):
     '''parent config file'''
     DEBUG = True
-    SECRET_KEY = 'HACHoooaadsf8960-38-(*&^W(*kdfll'
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    CONNECTION_STRING = os.getenv('CONNECTION_STRING')
 
 class DevelopmentConfig(Config):
-    '''Configurations for development'''
-    Debug = True
+    '''configurations for development'''
+    DEBUG = True
 
 class TestingConfig(Config):
     '''configurations for testing with a separate test database'''
     TESTING = True
-    Debug = True
+    DEBUG = True
+    CONNECTION_STRING = "dbname='test_db' user='postgres' host='localhost' password='testme'"
+    SECRET_KEY = 'KjkhFDjihkgy#$&(hdsdsddR#$gdd!'
+
+class ProductionConfig(Config):
+    '''configurations for production'''
+    DEBUG = False
+    TESTING = False
 
 app_config = {
     'development' : DevelopmentConfig,
-    'testing' : TestingConfig
+    'testing' : TestingConfig,
+    'production': ProductionConfig
 }

@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
+HOST: https://my-stackoverflow-lite-api.herokuapp.com
 
 # Stackoverflow-Lite
 
@@ -22,7 +22,7 @@ It takes a JSON object containing user information.
     
             {
                 "name":"Jay", "username":"jay", "email":"jay@abc.com",
-                "password":"Hello123", "confirm password":"Hello123"
+                "password":"Hello123", "confirm_password":"Hello123"
             }
 
 + Response 201 (application/json)
@@ -182,15 +182,33 @@ This Action requires a user to be logged in. They can post an answer to a questi
     
             Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
             
+    + Body
+    
+            {
+                "content": "Sample answer1"
+            }
                 
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
             {
                 "message": "Answer Posted!"
             }
 
+### Get Answers [GET]
+This action returns all answers to a particular question
++ Response 200 (application/json)
+
+            [
+                {
+                    "user1": "Sample answers content1"
+                },
+                {
+                    "user2": "Sample answers content2"
+                }
+            ]
+
 ## Accept or Update Answer [/api/v1/questions/<question_id>/answers/<answer_id>]
-### Accept or Update Answer [POST]
+### Accept or Update Answer [PUT]
 This Action requires a user to be logged in. If the user is the owner of the question they can accept an answer using this action. If the user is the owner of the answer they can update their answer using this action
 + Request (application/json)
 
@@ -198,11 +216,136 @@ This Action requires a user to be logged in. If the user is the owner of the que
     
             Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
             
-                
+        
 + Response 200 (application/json)
             
         { 
         "message": "Answer #<answer_id> accepted!" 
         }
 
+## Upvote answer [/api/v1/questions/<question_id>/answers/<answer_id>/upvote]
+### Upvote [POST]
+This Action requires a user to be logged in. The owner of an answer cannot vote on their own answer.
++ Request (application/json)
 
+    + Headers
+    
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
++ Response 200 (application/json)
+            
+        { 
+        "message": "Thanks for contributing!" 
+        }                
+
+## Downvote answer [/api/v1/questions/<question_id>/answers/<answer_id>/downvote]
+### Downvote [POST]
+This Action requires a user to be logged in. The owner of an answer cannot vote on their own answer.
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
++ Response 200 (application/json)
+            
+        { 
+        "message": "Thanks for contributing!" 
+        }                
+
+## User Questions [/api/v1/users/questions]
+### User's questions [GET]
+This Action requires a user to be logged in. User can view all questions they have posted.
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
++ Response 200 (application/json)
+
+            [
+                {
+                    "question_id": 2,
+                    "title": "Sample question2 title",
+                    "content": "Sample question content",
+                    "answers": 0
+                },
+                {
+                    "question_id": 3,
+                    "title": "Sample question3 title",
+                    "content": "Sample question content",
+                    "answers": 0
+                }
+            ]
+
+## Answer Comments [/api/v1/questions/<question_id>/answers/<answer_id>/comments]
+### Post a comment [POST]
+This Action requires a user to be logged in. User can post a comment to an answer.
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
+    + Body
+    
+            {
+                "content" : "Sample comment1"
+            }
++ Response 201 (application/json)
+
+            { 
+                "message": "Comment posted!" 
+            }
+            
+### Get all comments for an answer [GET]
++ Response 200 (application/json)
+
+            [
+                {
+                    "user": "sample updated comment"
+                }
+            ]
+        
+## Edit Comment [/api/v1/questions/<question_id>/answers/<answer_id>/comments/<comments_id>]
+### Edit comment [PUT]
+This Action requires a user to be logged in. User can update a comment they had posted.
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTQ0ZjA5YS01MTg2LTRjZWMtODdjMi04MjE3MWJkODg1NTciLCJleHAiOjE1MjI2MTQ0MTYsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTIyNjEzNTE2LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTIyNjEzNTE2LCJpZGVudGl0eSI6Im1pa2V5In0.GEiVrXXx9-j6KcrMBGfDgETZIBtdWGjCyExkKkTgXi4
+            
+    + Body
+    
+            {
+                "content" : "Sample update comment1"
+            }
++ Response 200 (application/json)
+
+            { 
+                "message": "Comment updated!" 
+            }
+            
+## Search Question [/api/v1/questions/search?limit=10]
+### Search a question [POST]
+This action allows a user to search for a question by title. A limit has to be passed in the URL arguments. 
+If the exact title is found id of the question is returned, if not a list of 10 closest matches is returned.
+
++ Request (application/json)
+    
+    + Body
+    
+            {
+                "content" : "question title"
+            }
+            
++ Response 200 (application/json)
+
+            [
+                "Sample question4 title",
+                "Sample question3 title",
+                "Sample question2 title",
+                "Sample question1 title"
+            ]
