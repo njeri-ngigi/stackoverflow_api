@@ -47,7 +47,7 @@ class Login(Resource):
         username = data.get("username")
         password = data.get("password")
         if not username or not password:
-            return dict(message="Username or password fields missing")
+            return dict(message="Username or password fields missing"), 400
         my_user = User()
         result = my_user.login(username, password)
         if "error" in result:

@@ -168,7 +168,21 @@ class RegisterUserTestCase(unittest.TestCase):
         self.assertEqual(result5.status_code, 401)
         self.assertEqual("Leaving so soon?", my_data4["message"])
         self.assertEqual("Token has been revoked", my_data5["msg"])
-
+        #test missing input data
+        result6 = self.client().post('/api/v1/auth/login',
+                                    content_type="application/json",
+                                    data=json.dumps({}))
+        my_data6 = json.loads(result6.data)
+        self.assertEqual(result6.status_code, 400)
+        self.assertEqual("Please enter username and password", my_data6["message"])
+        #test empty content
+        result7 = self.client().post('/api/v1/auth/login',
+                                    content_type="application/json",
+                                    data=json.dumps({"username":"", "password":""}))
+        my_data7 = json.loads(result7.data)
+        self.assertEqual(result7.status_code, 400)
+        self.assertEqual("Username or password fields missing", my_data7["message"])
+        
     def tearDown(self):
         current_environemt = os.environ['ENV']
         conn_string = app_config[current_environemt].CONNECTION_STRING
