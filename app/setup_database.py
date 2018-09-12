@@ -1,6 +1,5 @@
 '''app/setup_database.py'''
 import psycopg2
-from werkzeug.security import generate_password_hash, check_password_hash
 from instance.config import app_config
 
 class SetupDB(object):
@@ -61,8 +60,6 @@ class SetupDB(object):
                 c_content     VARCHAR(200) NOT NULL,
                 PRIMARY KEY   (comment_id, a_id)
                 );''')
-        
-
         db_connection.commit()
         cursor.close()
         db_connection.close()

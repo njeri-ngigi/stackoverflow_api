@@ -10,12 +10,12 @@ from app.setup_database import SetupDB
 def create_app(config_name):
     '''function enclosing the Flask App'''
     os.environ["ENV"] = config_name
-    from app.views import (Signup, Login, Logout, 
+    from app.views import (Signup, Login, Logout,
                            Questions, QuestionsQuestionId, QuestionsAnswers, QuestionsAnswersId,
-                           QuestionsAnswersUpvote, QuestionsAnswersDownvote, UserQuestions, AnswerComments,
-                           AnswerCommentsId, SearchQuestion)
+                           QuestionsAnswersUpvote, QuestionsAnswersDownvote, UserQuestions,
+                           AnswerComments, AnswerCommentsId, SearchQuestion)
     from app.models.revoked_token_model import RevokedTokens
-    
+
     SetupDB(config_name)
 
     app = Flask(__name__)

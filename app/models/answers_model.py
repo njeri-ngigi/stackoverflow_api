@@ -20,7 +20,7 @@ class AnswersModel(object):
         if not result:
             return False
         return True
-    
+
     def check_if_answer_exists(self, answer_id):
         'helper method to check if an answer exists'''
         self.cursor.execute("SELECT * FROM answers WHERE answer_id = (%s);", (answer_id,))
@@ -28,30 +28,33 @@ class AnswersModel(object):
         if not result:
             return False
         return result
-        
-    def post_answer(self,question_id, content, username):
+
+    def post_answer(self, question_id, content, username):
         '''post an answer'''
         result = self.check_if_question_exists(question_id)
         if not result:
             self.conn.close()
             return dict(message="Question doesn't exist", error=404)
-        self.cursor.execute("SELECT answer_id, a_username FROM answers WHERE a_content = (%s);", (content, ))
+        self.cursor.execute('''SELECT answer_id, a_username FROM answers
+                            WHERE a_content = (%s);''', (content, ))
         result = self.cursor.fetchone()
         if result:
             if result[1] == username:
                 self.conn.close()
-                return dict(message="You have already posted this answer. To edit answer vist question #" + 
-                            str(question_id) + " answer #" + str(result[0]), question_id=question_id, answer_id=result[0], error=409)
+                return dict(message="You have already posted this answer. To edit answer vist question #"
+                            + str(question_id) + " answer #" + str(result[0]),
+                            question_id=question_id, answer_id=result[0], error=409)
         sql = "INSERT INTO answers (q_id, a_content, a_username) VALUES (%s, %s, %s) RETURNING answer_id;"
-        self.cursor.execute(sql,(question_id, content, username))
+        self.cursor.execute(sql, (question_id, content, username))
         a_id = self.cursor.fetchone()[0]
         if not a_id:
             self.conn.close()
             return dict(message="Failed to post answer. Try again.", error=404)
-        self.cursor.execute("SELECT q_answers FROM questions WHERE question_id = (%s);",(question_id,))
+        self.cursor.execute("SELECT q_answers FROM questions WHERE question_id = (%s);", (question_id,))
         q_answers = self.cursor.fetchone()[0]
         q_answers = q_answers + 1
-        self.cursor.execute("UPDATE questions SET q_answers = (%s) WHERE question_id = (%s);", (q_answers, question_id,))
+        self.cursor.execute("UPDATE questions SET q_answers = (%s) WHERE question_id = (%s);",
+                            (q_answers, question_id,))
         self.conn.commit()
         self.conn.close()
         return dict(message="Answer Posted!")
@@ -80,15 +83,15 @@ class AnswersModel(object):
         result2 = self.check_if_answer_exists(answer_id)
         if not result2:
             self.conn.close()
-            return dict(message="This answer doesn't exist", error=404) 
+            return dict(message="This answer doesn't exist", error=404)
         if action == "update":
             if username == result2[3]:
-                self.cursor.execute("UPDATE answers SET a_content = (%s) WHERE answer_id = (%s);", (content, answer_id,))
+                self.cursor.execute("UPDATE answers SET a_content = (%s) WHERE answer_id = (%s);",
+                                    (content, answer_id,))
                 self.conn.commit()
                 self.conn.close()
                 return dict(message="Answer updated!")
             return dict(message="Unauthorized to edit answer", error=401)
-            
         self.cursor.execute("SELECT q_username FROM questions WHERE question_id = (%s);", (question_id,))
         u_name = self.cursor.fetchone()[0]
         if username != u_name:
@@ -113,7 +116,7 @@ class AnswersModel(object):
         if username == result2[3]:
             self.conn.close()
             return dict(message="You cannot vote on your own answer.", error=401)
-        self.cursor.execute("SELECT vote FROM votes WHERE v_username = (%s)",(username,))
+        self.cursor.execute("SELECT vote FROM votes WHERE v_username = (%s)", (username,))
         result4 = self.cursor.fetchone()
         user_vote = 0
         if result4:
@@ -184,7 +187,7 @@ class AnswersModel(object):
         if not result:
             self.conn.close()
             return dict(message="This answer doesn't exist", error=404)
-        self.cursor.execute("SELECT * FROM comments WHERE a_id = (%s);", (answer_id,)) 
+        self.cursor.execute("SELECT * FROM comments WHERE a_id = (%s);", (answer_id,))
         if limit:
             result2 = self.cursor.fetchmany(limit)
             self.conn.close()
@@ -203,7 +206,7 @@ class AnswersModel(object):
         if not result:
             self.conn.close()
             return dict(message="This answer doesn't exist", error=404)
-        self.cursor.execute("SELECT c_username FROM comments WHERE comment_id = (%s);", (comment_id,)) 
+        self.cursor.execute("SELECT c_username FROM comments WHERE comment_id = (%s);", (comment_id,))
         result = self.cursor.fetchone()
         if not result:
             self.conn.close()

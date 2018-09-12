@@ -1,8 +1,8 @@
+'''tests/test_answer_comments.py'''
 import os
-import psycopg2
 import unittest
 import json
-
+import psycopg2
 from app.application import create_app
 from instance.config import app_config
 
@@ -56,11 +56,12 @@ class TestQuestionAnswers(unittest.TestCase):
                            data=json.dumps({"content": "Sample answer 1"}))
         #commenter posts a comment
         self.client().post('/api/v1/questions/1/answers/1/comments',
-                                    headers=dict(Authorization="Bearer " + self.a_token3),
-                                    content_type="application/json",
-                                    data=json.dumps({"content": "Sample comment"}))
+                           headers=dict(Authorization="Bearer " + self.a_token3),
+                           content_type="application/json",
+                           data=json.dumps({"content": "Sample comment"}))
 
     def test_post_answer(self):
+        '''test handling posting answers'''
         #test successful post comment
         result = self.client().post('/api/v1/questions/1/answers/1/comments',
                                     headers=dict(Authorization="Bearer " + self.a_token3),
@@ -117,8 +118,9 @@ class TestQuestionAnswers(unittest.TestCase):
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 404)
         self.assertEqual("This answer doesn't exist", my_data7["message"])
-    
+
     def test_get_answer_comments(self):
+        '''test for getting comments for an answer'''
         #test successful fetch
         result = self.client().get('/api/v1/questions/1/answers/1/comments')
         my_data = json.loads(result.data)
@@ -136,28 +138,29 @@ class TestQuestionAnswers(unittest.TestCase):
         self.assertEqual("This answer doesn't exist", my_data3["message"])
         #test limit
         self.client().post('/api/v1/questions/1/answers/1/comments',
-                                    headers=dict(Authorization="Bearer " + self.a_token3),
-                                    content_type="application/json",
-                                    data=json.dumps({"content": "Sample comment2"}))
+                           headers=dict(Authorization="Bearer " + self.a_token3),
+                           content_type="application/json",
+                           data=json.dumps({"content": "Sample comment2"}))
         self.client().post('/api/v1/questions/1/answers/1/comments',
-                                    headers=dict(Authorization="Bearer " + self.a_token3),
-                                    content_type="application/json",
-                                    data=json.dumps({"content": "Sample comment3"}))
+                           headers=dict(Authorization="Bearer " + self.a_token3),
+                           content_type="application/json",
+                           data=json.dumps({"content": "Sample comment3"}))
         self.client().post('/api/v1/questions/1/answers/1/comments',
-                                    headers=dict(Authorization="Bearer " + self.a_token3),
-                                    content_type="application/json",
-                                    data=json.dumps({"content": "Sample comment1"}))
+                           headers=dict(Authorization="Bearer " + self.a_token3),
+                           content_type="application/json",
+                           data=json.dumps({"content": "Sample comment1"}))
         result4 = self.client().get('/api/v1/questions/1/answers/1/comments?limit=2')
         my_data4 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 200)
         self.assertEqual(len(my_data4), 2)
-    
+
     def test_update_comment(self):
+        '''test updating comments'''
         #test successful update
         result = self.client().put('/api/v1/questions/1/answers/1/comments/1',
-                                    headers=dict(Authorization="Bearer " + self.a_token3),
-                                    content_type="application/json",
-                                    data=json.dumps({"content": "Sample updated comment"}))
+                                   headers=dict(Authorization="Bearer " + self.a_token3),
+                                   content_type="application/json",
+                                   data=json.dumps({"content": "Sample updated comment"}))
         my_data = json.loads(result.data)
         self.assertEqual(result.status_code, 200)
         self.assertEqual("Comment updated!", my_data["message"])

@@ -7,8 +7,6 @@ from app.views.validate import Validate
 from app.models.user_model import User
 from app.models.revoked_token_model import RevokedTokens
 
-from app.setup_database import SetupDB
-
 class Signup(Resource):
     '''Class representing user registration'''
     @classmethod

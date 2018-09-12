@@ -1,9 +1,8 @@
 '''tests/test_questions.py'''
 import os
-import psycopg2
 import unittest
 import json
-
+import psycopg2
 from app.application import create_app
 from instance.config import app_config
 
@@ -36,7 +35,7 @@ class TestQuestions(unittest.TestCase):
                                   data=json.dumps({"username": "suite", "password": "Test123"}))
         u_data2 = json.loads(res2.data)
         self.a_token2 = u_data2["token"]
-        
+
         res3 = self.client().post('/api/v1/auth/login', content_type="application/json",
                                   data=json.dumps({"username": "user", "password": "Test123"}))
         u_data3 = json.loads(res3.data)
@@ -66,11 +65,11 @@ class TestQuestions(unittest.TestCase):
                                     data=json.dumps({"title": "Baking a sponge cake",
                                                      "content": "How many eggs to put in cake"}))
         result2 = self.client().post('/api/v1/questions',
-                                    headers=dict(Authorization="Bearer " + self.a_token),
-                                    content_type="application/json",
-                                    data=json.dumps({"title": "Baking a sponge cake",
-                                                     "content": "How many eggs to put in cake"}))
-        #post question with the same title        
+                                     headers=dict(Authorization="Bearer " + self.a_token),
+                                     content_type="application/json",
+                                     data=json.dumps({"title": "Baking a sponge cake",
+                                                      "content": "How many eggs to put in cake"}))
+        #post question with the same title
         my_data = json.loads(result.data)
         self.assertEqual(result.status_code, 201)
         self.assertEqual("Baking a sponge cake, Posted!", my_data["message"])
@@ -80,31 +79,31 @@ class TestQuestions(unittest.TestCase):
         self.assertEqual("Question has already been asked. Visit question #4", my_data2["message"])
         #test whitespaces
         result3 = self.client().post('/api/v1/questions',
-                                    headers=dict(Authorization="Bearer " + self.a_token),
-                                    content_type="application/json",
-                                    data=json.dumps({"title": "  ",
-                                                     "content": "  "}))
+                                     headers=dict(Authorization="Bearer " + self.a_token),
+                                     content_type="application/json",
+                                     data=json.dumps({"title": "  ",
+                                                      "content": "  "}))
         my_data3 = json.loads(result3.data)
         self.assertEqual(result3.status_code, 400)
         self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data3["message"])
         #test empty input fields
         result4 = self.client().post('/api/v1/questions',
-                                    headers=dict(Authorization="Bearer " + self.a_token),
-                                    content_type="application/json",
-                                    data=json.dumps({}))
+                                     headers=dict(Authorization="Bearer " + self.a_token),
+                                     content_type="application/json",
+                                     data=json.dumps({}))
         my_data4 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 400)
         self.assertEqual("Fields cannot be empty", my_data4["message"])
         #test for missing content and title
         result5 = self.client().post('/api/v1/questions',
-                                    headers=dict(Authorization="Bearer " + self.a_token),
-                                    content_type="application/json",
-                                    data=json.dumps({"title": "",
-                                                     "content": ""}))
+                                     headers=dict(Authorization="Bearer " + self.a_token),
+                                     content_type="application/json",
+                                     data=json.dumps({"title": "",
+                                                      "content": ""}))
         my_data5 = json.loads(result5.data)
         self.assertEqual(result5.status_code, 400)
         self.assertEqual("Title or Content fields missing", my_data5["message"])
-       
+
     def test_get_questions(self):
         '''test getting all questions and single questions'''
         #test get all questions
@@ -168,28 +167,30 @@ class TestQuestions(unittest.TestCase):
         my_data5 = json.loads(result5.data)
         self.assertEqual("Question doesn't exist", my_data5["message"])
         self.assertEqual(result5.status_code, 404)
-    
+
     def test_get_user_questions(self):
+        '''test getting user questions'''
         #test successful get
         result = self.client().get('/api/v1/users/questions',
-                                       headers=dict(Authorization="Bearer " + self.a_token2))
+                                   headers=dict(Authorization="Bearer " + self.a_token2))
         my_data = json.loads(result.data)
         self.assertGreaterEqual(len(my_data), 0)
-        self.assertEqual(result.status_code, 200) 
+        self.assertEqual(result.status_code, 200)
         #test limit
         result2 = self.client().get('/api/v1/users/questions?limit=1',
-                                       headers=dict(Authorization="Bearer " + self.a_token2))
+                                    headers=dict(Authorization="Bearer " + self.a_token2))
         my_data2 = json.loads(result2.data)
         self.assertEqual(len(my_data2), 1)
         self.assertEqual(result2.status_code, 200)
         #test user has no questions
         result3 = self.client().get('/api/v1/users/questions?limit=1',
-                                       headers=dict(Authorization="Bearer " + self.a_token3))
+                                    headers=dict(Authorization="Bearer " + self.a_token3))
         my_data3 = json.loads(result3.data)
         self.assertEqual(result3.status_code, 200)
         self.assertEqual(len(my_data3), 0)
 
     def test_search_question(self):
+        '''test searching questions'''
         #successfull serach by title
         result = self.client().post('/api/v1/questions/search?limit=10',
                                     content_type="application/json",
