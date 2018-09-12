@@ -2,7 +2,7 @@
 from flask import jsonify, render_template
 from app.application import create_app
 
-CONFIG_NAME = "development"
+CONFIG_NAME = "production"
 app = create_app(CONFIG_NAME)
 
 '''Error handlers'''
