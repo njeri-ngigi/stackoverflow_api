@@ -193,6 +193,30 @@ class TestQuestionAnswers(unittest.TestCase):
         my_data5 = json.loads(result5.data)
         self.assertEqual(result5.status_code, 404)
         self.assertEqual("Comment doesn't exist", my_data5["message"])
+        #test empty input fields
+        result6 = self.client().put('/api/v1/questions/1/answers/1/comments/1',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({}))
+        my_data6 = json.loads(result6.data)
+        self.assertEqual(result6.status_code, 400)
+        self.assertEqual("Field cannot be empty", my_data6["message"])
+        #test missing content
+        result7 = self.client().put('/api/v1/questions/1/answers/1/comments/1',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": ""}))
+        my_data7 = json.loads(result7.data)
+        self.assertEqual(result7.status_code, 400)
+        self.assertEqual("Please enter content", my_data7["message"])
+        #test whitespaces
+        result8 = self.client().put('/api/v1/questions/1/answers/1/comments/1',
+                                    headers=dict(Authorization="Bearer " + self.a_token3),
+                                    content_type="application/json",
+                                    data=json.dumps({"content": "  "}))
+        my_data8 = json.loads(result8.data)
+        self.assertEqual(result8.status_code, 400)
+        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data8["message"])
 
     def tearDown(self):
         current_environemt = os.environ['ENV']
