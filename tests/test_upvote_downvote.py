@@ -1,8 +1,8 @@
+'''test/test_upvote_downvote.py'''
 import os
-import psycopg2
 import unittest
 import json
-
+import psycopg2
 from app.application import create_app
 from instance.config import app_config
 
@@ -56,11 +56,12 @@ class TestQuestionAnswers(unittest.TestCase):
                                             "content": "How much baking soda to use?"}))
         #user2 posts answer
         self.client().post('/api/v1/questions/1/answers',
-                                    headers=dict(Authorization="Bearer " + self.a_token2),
-                                    content_type="application/json",
-                                    data=json.dumps({"content": "Use git branch <branch_name>"}))
+                           headers=dict(Authorization="Bearer " + self.a_token2),
+                           content_type="application/json",
+                           data=json.dumps({"content": "Use git branch <branch_name>"}))
 
     def test_upvote_downvote_answer(self):
+        '''test upvote'''
         #successful upvote
         result = self.client().post('/api/v1/questions/1/answers/1/upvote',
                                     headers=dict(Authorization="Bearer " + self.a_token3))
@@ -93,9 +94,10 @@ class TestQuestionAnswers(unittest.TestCase):
         self.assertEqual("You cannot vote on your own answer.", my_data4["message"])
 
     def test_downvote_answer(self):
+        '''test downvote'''
         #successful downvote
         result = self.client().post('/api/v1/questions/1/answers/1/downvote',
-                                     headers=dict(Authorization="Bearer " + self.a_token3))
+                                    headers=dict(Authorization="Bearer " + self.a_token3))
         result2 = self.client().post('/api/v1/questions/1/answers/1/downvote',
                                      headers=dict(Authorization="Bearer " + self.a_token3))
         my_data = json.loads(result.data)
@@ -123,7 +125,7 @@ class TestQuestionAnswers(unittest.TestCase):
         my_data5 = json.loads(result5.data)
         self.assertEqual(result5.status_code, 401)
         self.assertEqual("You cannot vote on your own answer.", my_data5["message"])
-        
+
     def tearDown(self):
         current_environemt = os.environ['ENV']
         conn_string = app_config[current_environemt].CONNECTION_STRING

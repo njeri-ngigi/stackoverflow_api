@@ -1,7 +1,7 @@
 '''app/models.user_model.py'''
 import os
-import psycopg2
 from werkzeug.security import generate_password_hash, check_password_hash
+import psycopg2
 from instance.config import app_config
 
 CURRENT_ENVIRONMENT = os.environ['ENV']
@@ -27,7 +27,7 @@ class User(object):
         result2 = self.cursor.fetchone()
         if result2:
             return dict(message="Email already in use. Try a different one.", error=409)
-       
+
         sql = """INSERT INTO users(name, username, email, password)
                  VALUES(%s, %s, %s, %s);"""
         self.cursor.execute(sql, (name, username, email, pw_hash))
@@ -39,7 +39,6 @@ class User(object):
         if not result2:
             return dict(message="Failed to signup, try again.", error=404)
         return dict(message="Welcome " + username + "!")
-        
 
     def login(self, username, password):
         '''login user'''

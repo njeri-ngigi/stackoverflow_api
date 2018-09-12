@@ -1,9 +1,8 @@
 '''tests/test_question_answers.py'''
 import os
-import psycopg2
 import unittest
 import json
-
+import psycopg2
 from app.application import create_app
 from instance.config import app_config
 
@@ -57,13 +56,13 @@ class TestQuestionAnswers(unittest.TestCase):
                                             "content": "Content"}))
         #user2 posts answers
         self.client().post('/api/v1/questions/1/answers',
-                                    headers=dict(Authorization="Bearer " + self.a_token2),
-                                    content_type="application/json",
-                                    data=json.dumps({"content": "Use git branch <branch_name>"}))
+                           headers=dict(Authorization="Bearer " + self.a_token2),
+                           content_type="application/json",
+                           data=json.dumps({"content": "Use git branch <branch_name>"}))
         self.client().post('/api/v1/questions/1/answers',
-                                    headers=dict(Authorization="Bearer " + self.a_token2),
-                                    content_type="application/json",
-                                    data=json.dumps({"content": "Sample answer"}))
+                           headers=dict(Authorization="Bearer " + self.a_token2),
+                           content_type="application/json",
+                           data=json.dumps({"content": "Sample answer"}))
     def test_post_answer(self):
         '''test handling posting an answer'''
         #test successful post
@@ -73,9 +72,9 @@ class TestQuestionAnswers(unittest.TestCase):
                                     data=json.dumps({"content": "Use git checkout branch <branch_name>"}))
         #test repeated answer
         result2 = self.client().post('/api/v1/questions/1/answers',
-                                    headers=dict(Authorization="Bearer " + self.a_token2),
-                                    content_type="application/json",
-                                    data=json.dumps({"content": "Use git checkout branch <branch_name>"}))
+                                     headers=dict(Authorization="Bearer " + self.a_token2),
+                                     content_type="application/json",
+                                     data=json.dumps({"content": "Use git checkout branch <branch_name>"}))
         my_data = json.loads(result.data)
         self.assertEqual(result.status_code, 201)
         self.assertEqual("Answer Posted!", my_data["message"])
@@ -116,7 +115,7 @@ class TestQuestionAnswers(unittest.TestCase):
         self.assertEqual(result6.status_code, 400)
         self.assertEqual("Please enter answer content", my_data6["message"])
 
-    def test_get_all_answers_to_question(self):
+    def test_get_all_question_answers(self):
         '''test handling getting all answers to a question'''
         #successful get
         result = self.client().get('/api/v1/questions/1/answers')

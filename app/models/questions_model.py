@@ -1,8 +1,8 @@
 '''app/models/questions_model.py'''
 import os
-import psycopg2
 from difflib import get_close_matches
 from itertools import chain
+import psycopg2
 from instance.config import app_config
 
 CURRENT_ENVIRONMENT = os.environ['ENV']
@@ -17,14 +17,13 @@ class QuestionsModel(object):
 
     def post_question(self, title, content, username):
         '''Post a question'''
-        self.cursor.execute("SELECT * FROM questions WHERE q_title = (%s);",(title, ))
+        self.cursor.execute("SELECT * FROM questions WHERE q_title = (%s);", (title, ))
         result = self.cursor.fetchone()
         if result:
-            return dict(message="Question has already been asked. Visit question #" + 
+            return dict(message="Question has already been asked. Visit question #" +
                         str(result[0]), question_id=result[0], error=409)
         sql = """INSERT INTO questions(q_title, q_content, q_username)
                  VALUES(%s, %s, %s) RETURNING question_id;"""
-        
         self.cursor.execute(sql, (title, content, username))
         q_id = self.cursor.fetchone()[0]
         self.conn.commit()
@@ -75,7 +74,7 @@ class QuestionsModel(object):
 
     def get_all_user_questions(self, username, limit=None):
         '''get all questions a user has ever asked'''
-        self.cursor.execute("SELECT * FROM questions WHERE q_username = (%s);",(username,))
+        self.cursor.execute("SELECT * FROM questions WHERE q_username = (%s);", (username,))
         if limit:
             result = self.cursor.fetchmany(limit)
             self.conn.close()

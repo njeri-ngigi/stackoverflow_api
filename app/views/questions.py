@@ -45,12 +45,12 @@ class Questions(Resource):
         content = content.strip()
         if not title or not content:
             return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
-            
         username = get_jwt_identity()
         my_question = QuestionsModel()
         result = my_question.post_question(title, content, username)
         if "error" in result:
-            return dict(message=result["message"], question_id=result["question_id"]), result["error"]
+            return dict(message=result["message"],
+                        question_id=result["question_id"]), result["error"]
         return dict(message=result["title"] + ", Posted!"), 201
 
 class QuestionsQuestionId(Resource):
@@ -99,7 +99,7 @@ class QuestionsAnswers(Resource):
         my_answer = AnswersModel()
         result = my_answer.post_answer(q_id, content, username)
         if "question_id" in result:
-            return dict(message=result["message"], question_id=result["question_id"], 
+            return dict(message=result["message"], question_id=result["question_id"],
                         answer_id=result["answer_id"]), result["error"]
         if "error" in result:
             return dict(message=result["message"]), result["error"]
@@ -144,9 +144,9 @@ class QuestionsAnswersId(Resource):
             content = content.strip()
             if not content:
                 return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
-            action = "update" 
+            action = "update"
         my_answer = AnswersModel()
-        result = my_answer.update_or_accept_answer(q_id, a_id, username, content, action) 
+        result = my_answer.update_or_accept_answer(q_id, a_id, username, content, action)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200
@@ -180,21 +180,22 @@ class QuestionsAnswersDownvote(Resource):
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200
-    
+
 class UserQuestions(Resource):
     '''class representing get all user questions'''
     @classmethod
     @jwt_required
     def get(cls):
+        '''get all user's questions'''
         limit = request.args.get('limit')
         if limit:
             limit = ast.literal_eval(limit)
         username = get_jwt_identity()
         my_question = QuestionsModel()
         result = my_question.get_all_user_questions(username, limit)
-        all_questions = []    
+        all_questions = []
         for i in result:
-            question={"question_id":i[0], "title":i[1], "content":i[2], "answers":i[4]}
+            question = {"question_id": i[0], "title": i[1], "content": i[2], "answers": i[4]}
             all_questions.append(question)
         return all_questions, 200
 
@@ -220,7 +221,8 @@ class AnswerComments(Resource):
         result = my_answer.post_comment(q_id, a_id, username, content)
         if "question_id" in result:
             return dict(message=result["message"], question_id=result["question_id"],
-                        answer_id=result["answer_id"], comment_id=result["comment_id"]), result["error"]
+                        answer_id=result["answer_id"],
+                        comment_id=result["comment_id"]), result["error"]
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 201
@@ -241,12 +243,12 @@ class AnswerComments(Resource):
         for i in result:
             all_comments.append({i[2]:i[3]})
         return all_comments, 200
-    
+
 class AnswerCommentsId(Resource):
     '''class representing update comment'''
     @classmethod
     @jwt_required
-    def put(self, question_id, answer_id, comments_id):
+    def put(cls, question_id, answer_id, comments_id):
         '''update comment'''
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
@@ -270,7 +272,7 @@ class AnswerCommentsId(Resource):
 class SearchQuestion(Resource):
     '''class representing search question'''
     @classmethod
-    def post(self):
+    def post(cls):
         '''search question'''
         limit = request.args.get('limit')
         if not limit:
@@ -285,7 +287,6 @@ class SearchQuestion(Resource):
         content = content.strip()
         if not content:
             return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
-        
         my_question = QuestionsModel()
         result = my_question.search_question(content, limit)
         if "error" in result:

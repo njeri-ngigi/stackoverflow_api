@@ -1,8 +1,8 @@
+'''tests/test_accept_update_answer.py'''
 import os
-import psycopg2
 import unittest
 import json
-
+import psycopg2
 from app.application import create_app
 from instance.config import app_config
 
@@ -103,7 +103,8 @@ class TestQuestionAnswers(unittest.TestCase):
                                     data=json.dumps({"content": "  "}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
-        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data7["message"])
+        self.assertEqual("Enter valid data. Look out for whitespaces in fields.",
+                         my_data7["message"])
         #missing input content field
         result8 = self.client().put('/api/v1/questions/1/answers/1',
                                     headers=dict(Authorization="Bearer " + self.a_token2),
@@ -112,7 +113,7 @@ class TestQuestionAnswers(unittest.TestCase):
         my_data8 = json.loads(result8.data)
         self.assertEqual(result8.status_code, 400)
         self.assertEqual("Please enter answer content", my_data8["message"])
-        
+
     def tearDown(self):
         current_environemt = os.environ['ENV']
         conn_string = app_config[current_environemt].CONNECTION_STRING

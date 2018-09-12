@@ -1,8 +1,8 @@
 '''tests/test_user_registration.py'''
 import os
-import psycopg2
 import unittest
 import json
+import psycopg2
 from app.application import create_app
 from instance.config import app_config
 
@@ -119,10 +119,10 @@ class RegisterUserTestCase(unittest.TestCase):
         self.assertEqual("Passwords don't match", my_data6["message"])
         #test for whitespaces
         result7 = self.client().post('/api/v1/auth/signup',
-                                    content_type="application/json",
-                                    data=json.dumps({"name": "  ", "username": "  ",
-                                                     "email": "njery@to.cm", "password": "Test123",
-                                                     "confirm_password": "Test123"}))
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "  ", "username": "  ",
+                                                      "email": "njery@to.cm", "password": "Test123",
+                                                      "confirm_password": "Test123"}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
         self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data7["message"])
