@@ -135,7 +135,7 @@ class QuestionsAnswersId(Resource):
         a_id = ast.literal_eval(answer_id)
         username = get_jwt_identity()
         content = ""
-        action = "accept"
+        action = ""
         if data:
             content = data.get("content")
             if not content:
