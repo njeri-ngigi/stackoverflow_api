@@ -3,6 +3,7 @@ import os
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 from instance.config import app_config
 from app.setup_database import SetupDB
@@ -19,6 +20,7 @@ def create_app(config_name):
     SetupDB(config_name)
 
     app = Flask(__name__)
+    CORS(app)
     api = Api(app)
 
     app.url_map.strict_slashes = False

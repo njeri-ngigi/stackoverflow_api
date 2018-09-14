@@ -140,7 +140,6 @@ class QuestionsAnswersId(Resource):
             content = data.get("content")
             if not content:
                 return dict(message="Please enter answer content"), 400
-
             content = content.strip()
             if not content:
                 return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
