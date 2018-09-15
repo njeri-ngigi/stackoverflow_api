@@ -36,23 +36,21 @@ class Questions(Resource):
         '''post a question'''
         data = request.get_json()
         result = validate.check_for_data(data)
-        if result:
-            return result, 400
-        title = data.get("title")
-        content = data.get("content")
-        result = validate.check_for_content([title, content])
-        if result:
-            return result, 400
-        result = validate.check_for_white_spaces([title, content])        
-        if result:
-            return result, 400
-        username = get_jwt_identity()
-        my_question = QuestionsModel()
-        result = my_question.post_question(title, content, username)
-        if "error" in result:
-            return dict(message=result["message"],
-                        question_id=result["question_id"]), result["error"]
-        return dict(message=result["title"] + ", Posted!"), 201
+        if not result:
+            title = data.get("title")
+            content = data.get("content")
+            result = validate.check_for_content([title, content])
+            if not result:
+                result = validate.check_for_white_spaces([title, content])        
+                if not result:
+                    username = get_jwt_identity()
+                    my_question = QuestionsModel()
+                    result2 = my_question.post_question(title, content, username)
+                    if "error" in result2:
+                        return dict(message=result2["message"],
+                                    question_id=result2["question_id"]), result2["error"]
+                    return result2, 201
+        return result, 400
 
 class QuestionsQuestionId(Resource):
     '''Class respresenting activities for a single question'''

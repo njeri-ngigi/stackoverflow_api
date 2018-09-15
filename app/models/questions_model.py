@@ -21,7 +21,7 @@ class QuestionsModel(BaseModel):
         self.cursor.close()
         if not q_id:
             return dict(message="Failed to add question. Try again.", error=404)
-        return dict(title=title)
+        return dict(message=title + ", Posted!")
 
     def get_all_questions(self, limit=None, most_answers=None):
         '''get all questions'''
