@@ -84,27 +84,27 @@ class QuestionsAnswers(Resource):
     @jwt_required
     def post(cls, question_id):
         '''post an answer'''
+        error = {}
         data = request.get_json()
         result = validate.check_for_data(data)
-        if result:
-            return result, 400
-        content = data.get("content")
-        result = validate.check_for_content([content])
-        if result:
-            return result, 400
-        result = validate.check_for_white_spaces([content])
-        if result:
-            return result, 400
-        username = get_jwt_identity()
-        q_id = ast.literal_eval(question_id)
-        my_answer = AnswersModel()
-        result = my_answer.post_answer(q_id, content, username)
-        if "question_id" in result:
-            return dict(message=result["message"], question_id=result["question_id"],
-                        answer_id=result["answer_id"]), result["error"]
-        if "error" in result:
-            return dict(message=result["message"]), result["error"]
-        return result, 201
+        if not result:
+            content = data.get("content")
+            result = validate.check_for_content([content])
+            if not result:
+                result = validate.check_for_white_spaces([content])
+                if not result:
+                    username = get_jwt_identity()
+                    q_id = ast.literal_eval(question_id)
+                    my_answer = AnswersModel()
+                    result2 = my_answer.post_answer(q_id, content, username)
+                    if "question_id" in result2:
+                        return dict(message=result2["message"], question_id=result2["question_id"],
+                                    answer_id=result2["answer_id"]), result2["error"]
+                    if "error" in result2:
+                        return dict(message=result2["message"]), result2["error"]
+                    return result2, 201
+        error.update(result)
+        return error, 400
 
     @classmethod
     def get(cls, question_id):
