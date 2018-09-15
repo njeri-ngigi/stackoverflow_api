@@ -5,7 +5,7 @@ from app.models.base_models import BaseModel
 class AnswersModel(BaseModel):
     '''answers class model'''
     def check_if_question_exists(self, question_id):
-        '''helper method to check if a question exists'''
+        '''check if question exists'''
         self.cursor.execute("SELECT * FROM questions WHERE question_id = (%s);", (question_id,))
         result = self.cursor.fetchone()
         if not result:
@@ -13,7 +13,7 @@ class AnswersModel(BaseModel):
         return True
 
     def check_if_answer_exists(self, answer_id):
-        'helper method to check if an answer exists'''
+        '''check if an answer exists'''
         self.cursor.execute("SELECT * FROM answers WHERE answer_id = (%s);", (answer_id,))
         result = self.cursor.fetchone()
         if not result:
@@ -67,32 +67,39 @@ class AnswersModel(BaseModel):
 
     def update_or_accept_answer(self, question_id, answer_id, username, content, action):
         '''Update or accept answer'''
-        result = self.check_if_question_exists(question_id)
+        errors={}
+        result = self.check_if_answer_exists(answer_id)
         if not result:
-            self.conn.close()
-            return dict(message="Question doesn't exist", error=404)
-        result2 = self.check_if_answer_exists(answer_id)
+            errors.update(dict(message="This answer doesn't exist", error=404))
+        result2 = self.check_if_question_exists(question_id)
         if not result2:
+            errors.update(dict(message="Question doesn't exist", error=404))
+        if errors:
             self.conn.close()
-            return dict(message="This answer doesn't exist", error=404)
+            return errors
         if action == "update":
-            if username == result2[3]:
+            if username == result[3]:
                 self.cursor.execute("UPDATE answers SET a_content = (%s) WHERE answer_id = (%s);",
                                     (content, answer_id,))
-                self.conn.commit()
-                self.conn.close()
-                return dict(message="Answer updated!")
-            return dict(message="Unauthorized to edit answer", error=401)
-        self.cursor.execute("SELECT q_username FROM questions WHERE question_id = (%s);", (question_id,))
-        u_name = self.cursor.fetchone()[0]
-        if username != u_name:
-            return dict(message="Unauthorized to accept answer", error=401)
-        self.cursor.execute("UPDATE answers SET accepted = (%s) WHERE accepted = (%s);", (0, 1,))
-        self.cursor.execute("UPDATE answers SET accepted = (%s) WHERE answer_id = (%s);", (1, answer_id,))
-        self.cursor.execute("UPDATE questions SET q_accepted_answer = (%s) WHERE question_id = (%s);", (answer_id, question_id,))
+                message = dict(message="Answer updated!")
+            else:
+                errors.update(dict(message="Unauthorized to edit answer", error=401))
+        if action == "accept":
+            self.cursor.execute("SELECT q_username FROM questions WHERE question_id = (%s);", (question_id,))
+            u_name = self.cursor.fetchone()[0]
+            if username == u_name:
+                self.cursor.execute("UPDATE answers SET accepted = (%s) WHERE accepted = (%s);", (0, 1,))
+                self.cursor.execute("UPDATE answers SET accepted = (%s) WHERE answer_id = (%s);", (1, answer_id,))
+                self.cursor.execute("UPDATE questions SET q_accepted_answer = (%s) WHERE question_id = (%s);", (answer_id, question_id,))
+                message = dict(message="Answer #" + str(answer_id) + " accepted!")
+            else:
+                errors.update(dict(message="Unauthorized to accept answer", error=401))
+        if errors:
+            self.conn.close()
+            return errors
         self.conn.commit()
         self.conn.close()
-        return dict(message="Answer #" + str(answer_id) + " accepted!")
+        return message
 
     def upvote_or_downvote(self, question_id, answer_id, username, vote):
         '''upvote or downvote an answer'''
@@ -189,22 +196,23 @@ class AnswersModel(BaseModel):
 
     def update_comment(self, question_id, answer_id, comment_id, username, content):
         '''update a comment on an answer'''
-        result = self.check_if_question_exists(question_id)
-        if not result:
-            self.conn.close()
-            return dict(message="Question doesn't exist", error=404)
-        result = self.check_if_answer_exists(answer_id)
-        if not result:
-            self.conn.close()
-            return dict(message="This answer doesn't exist", error=404)
+        errors = {}
         self.cursor.execute("SELECT c_username FROM comments WHERE comment_id = (%s);", (comment_id,))
         result = self.cursor.fetchone()
         if not result:
+            errors.update(dict(message="Comment doesn't exist", error=404))
+        result2 = self.check_if_answer_exists(answer_id)
+        if not result2:
+            errors.update(dict(message="This answer doesn't exist", error=404))
+        result2 = self.check_if_question_exists(question_id)
+        if not result2:
+            errors.update(dict(message="Question doesn't exist", error=404))        
+        if result:
+            if result[0] != username:
+                errors.update(dict(message="Unauthorized to edit this comment.", error=401))
+        if errors:
             self.conn.close()
-            return dict(message="Comment doesn't exist", error=404)
-        if result[0] != username:
-            self.conn.close()
-            return dict(message="Unauthorized to edit this comment.", error=401)
+            return errors
         self.cursor.execute("UPDATE comments SET c_content = (%s) WHERE comment_id = (%s);", (content, comment_id))
         self.conn.commit()
         self.conn.close()
