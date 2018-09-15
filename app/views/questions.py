@@ -6,6 +6,9 @@ from flask_jwt_extended import (jwt_required, get_jwt_identity)
 
 from app.models.questions_model import QuestionsModel
 from app.models.answers_model import AnswersModel
+from app.views.validate import Validate
+
+validate = Validate()
 
 class Questions(Resource):
     '''class representing retrieving all questions and posting questing endpoint'''
@@ -21,8 +24,6 @@ class Questions(Resource):
             result = my_question.get_question_most_answers(limit)
         else:
             result = my_question.get_all_questions(limit)
-        if not result:
-            return result, 200
         all_questions = []
         for i in result:
             question = dict(id=i[0], title=i[1], content=i[2], username=i[3], answers_given=i[5])
@@ -34,17 +35,17 @@ class Questions(Resource):
     def post(cls):
         '''post a question'''
         data = request.get_json()
-        if not data:
-            return dict(message="Fields cannot be empty"), 400
+        result = validate.check_for_data(data)
+        if result:
+            return result, 400
         title = data.get("title")
         content = data.get("content")
-        if not title or not content:
-            return dict(message="Title or Content fields missing"), 400
-        #check for whitespaces
-        title = title.strip()
-        content = content.strip()
-        if not title or not content:
-            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+        result = validate.check_for_content([title, content])
+        if result:
+            return result, 400
+        result = validate.check_for_white_spaces([title, content])        
+        if result:
+            return result, 400
         username = get_jwt_identity()
         my_question = QuestionsModel()
         result = my_question.post_question(title, content, username)
@@ -84,16 +85,16 @@ class QuestionsAnswers(Resource):
     def post(cls, question_id):
         '''post an answer'''
         data = request.get_json()
-        if not data:
-            return dict(message="Field(s) cannot be empty"), 400
+        result = validate.check_for_data(data)
+        if result:
+            return result, 400
         content = data.get("content")
-        if not content:
-            return dict(message="Please enter answer content"), 400
-        #check for whitespaces
-        content = content.strip()
-        if not content:
-            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
-
+        result = validate.check_for_content([content])
+        if result:
+            return result, 400
+        result = validate.check_for_white_spaces([content])
+        if result:
+            return result, 400
         username = get_jwt_identity()
         q_id = ast.literal_eval(question_id)
         my_answer = AnswersModel()
@@ -138,11 +139,12 @@ class QuestionsAnswersId(Resource):
         action = ""
         if data:
             content = data.get("content")
-            if not content:
-                return dict(message="Please enter answer content"), 400
-            content = content.strip()
-            if not content:
-                return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+            result = validate.check_for_content([content])
+            if result:
+                return result, 400
+            result = validate.check_for_white_spaces([content])
+            if result:
+                return result, 400
             action = "update"
         my_answer = AnswersModel()
         result = my_answer.update_or_accept_answer(q_id, a_id, username, content, action)
@@ -208,14 +210,16 @@ class AnswerComments(Resource):
         a_id = ast.literal_eval(answer_id)
         username = get_jwt_identity()
         data = request.get_json()
-        if not data:
-            return dict(message="Field cannot be empty"), 400
+        result = validate.check_for_data(data)
+        if result:
+            return result, 400
         content = data.get("content")
-        if not content:
-            return dict(message="Please enter content"), 400
-        content = content.strip()
-        if not content:
-            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+        result = validate.check_for_content([content])
+        if result:
+            return result, 400
+        result = validate.check_for_white_spaces([content])
+        if result:
+            return result, 400
         my_answer = AnswersModel()
         result = my_answer.post_comment(q_id, a_id, username, content)
         if "question_id" in result:
@@ -254,14 +258,16 @@ class AnswerCommentsId(Resource):
         c_id = ast.literal_eval(comments_id)
         username = get_jwt_identity()
         data = request.get_json()
-        if not data:
-            return dict(message="Field cannot be empty"), 400
+        result = validate.check_for_data(data)
+        if result:
+            return result, 400
         content = data.get("content")
-        if not content:
-            return dict(message="Please enter content"), 400
-        content = content.strip()
-        if not content:
-            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+        result = validate.check_for_content([content])
+        if result:
+            return result, 400
+        result = validate.check_for_white_spaces([content])
+        if result:
+            return result, 400
         my_answer = AnswersModel()
         result = my_answer.update_comment(q_id, a_id, c_id, username, content)
         if "error" in result:
@@ -278,14 +284,16 @@ class SearchQuestion(Resource):
             return dict(message="Enter a limit to search through"), 400
         limit = ast.literal_eval(limit)
         data = request.get_json()
-        if not data:
-            return dict(message="Field cannot be empty"), 400
+        result = validate.check_for_data(data)
+        if result:
+            return result, 400
         content = data.get("content")
-        if not content:
-            return dict(message="Please enter content"), 400
-        content = content.strip()
-        if not content:
-            return dict(message="Enter valid data. Look out for whitespaces in fields."), 400
+        result = validate.check_for_content([content])
+        if result:
+            return result, 400
+        result = validate.check_for_white_spaces([content])
+        if result:
+            return result, 400
         my_question = QuestionsModel()
         result = my_question.search_question(content, limit)
         if "error" in result:

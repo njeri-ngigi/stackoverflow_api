@@ -42,7 +42,20 @@ class Validate(object):
         for i in my_list:
             i = i.strip()
             if not i:
-                return {"message": "Enter valid data. Look out for whitespaces in fields."}
+                return {"message": "Enter valid data. Look out for whitespaces in field(s)."}
+    
+    def check_for_data(self, data):
+        if not data:
+            return dict(message="Field(s) cannot be empty")
+
+    def check_for_content(self, content):
+        message = ""
+        message = "Content field missing"
+        if len(content) > 1:
+            message = "Title or Content fields missing"
+        for i in content:
+            if not i:
+                return dict(message=message)
 
     def validate_register(self, username, name, email, passwords):
         '''validate user register data '''
