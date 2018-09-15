@@ -21,7 +21,7 @@ class Questions(Resource):
         query = request.args.get('query')
         my_question = QuestionsModel()
         if query == "most_answers":
-            result = my_question.get_question_most_answers(limit)
+            result = my_question.get_all_questions(limit, most_answers=True)
         else:
             result = my_question.get_all_questions(limit)
         all_questions = []

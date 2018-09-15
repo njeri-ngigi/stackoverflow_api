@@ -23,9 +23,12 @@ class QuestionsModel(BaseModel):
             return dict(message="Failed to add question. Try again.", error=404)
         return dict(title=title)
 
-    def get_all_questions(self, limit=None):
+    def get_all_questions(self, limit=None, most_answers=None):
         '''get all questions'''
-        self.cursor.execute("SELECT * FROM questions")
+        sql = "SELECT * FROM questions"
+        if most_answers:
+            sql = "SELECT * FROM questions ORDER BY q_answers DESC"
+        self.cursor.execute(sql)
         if limit:
             result = self.cursor.fetchmany(limit)
             self.conn.close()
@@ -66,17 +69,6 @@ class QuestionsModel(BaseModel):
     def get_all_user_questions(self, username, limit=None):
         '''get all questions a user has ever asked'''
         self.cursor.execute("SELECT * FROM questions WHERE q_username = (%s);", (username,))
-        if limit:
-            result = self.cursor.fetchmany(limit)
-            self.conn.close()
-            return result
-        result = self.cursor.fetchall()
-        self.conn.close()
-        return result
-
-    def get_question_most_answers(self, limit=None):
-        '''get questions with most answers'''
-        self.cursor.execute("SELECT * FROM questions ORDER BY q_answers DESC")
         if limit:
             result = self.cursor.fetchmany(limit)
             self.conn.close()
