@@ -1,61 +1,9 @@
 '''tests/test_questions.py'''
-import os
-import unittest
 import json
-import psycopg2
-from app.application import create_app
-from instance.config import app_config
+from tests.base_test import BaseTest
 
-class TestQuestions(unittest.TestCase):
-    '''Class testing questions'''
-    def setUp(self):
-        self.app = create_app(config_name="testing")
-        self.client = self.app.test_client
-
-        #register 2 users
-        self.client().post('/api/v1/auth/signup', content_type="application/json",
-                           data=json.dumps({"name": "Njeri", "username": "njery",
-                                            "email": "njeri@to.com", "password": "Test123",
-                                            "confirm_password": "Test123"}))
-        self.client().post('/api/v1/auth/signup', content_type="application/json",
-                           data=json.dumps({"name": "Suite", "username": "suite",
-                                            "email": "suite@to.com", "password": "Test123",
-                                            "confirm_password": "Test123"}))
-        self.client().post('/api/v1/auth/signup', content_type="application/json",
-                           data=json.dumps({"name": "User", "username": "user",
-                                            "email": "user@to.com", "password": "Test123",
-                                            "confirm_password": "Test123"}))
-        #login in all users
-        res = self.client().post('/api/v1/auth/login', content_type="application/json",
-                                 data=json.dumps({"username": "njery", "password": "Test123"}))
-        u_data = json.loads(res.data)
-        self.a_token = u_data["token"]
-
-        res2 = self.client().post('/api/v1/auth/login', content_type="application/json",
-                                  data=json.dumps({"username": "suite", "password": "Test123"}))
-        u_data2 = json.loads(res2.data)
-        self.a_token2 = u_data2["token"]
-
-        res3 = self.client().post('/api/v1/auth/login', content_type="application/json",
-                                  data=json.dumps({"username": "user", "password": "Test123"}))
-        u_data3 = json.loads(res3.data)
-        self.a_token3 = u_data3["token"]
-        #post 3 questions
-        self.client().post('/api/v1/questions',
-                           headers=dict(Authorization="Bearer " + self.a_token),
-                           content_type="application/json",
-                           data=json.dumps({"title": "Git branching",
-                                            "content": "How to create, checkout a branch in git"}))
-        self.client().post('/api/v1/questions',
-                           headers=dict(Authorization="Bearer " + self.a_token2),
-                           content_type="application/json",
-                           data=json.dumps({"title": "How to make a github page?",
-                                            "content": "How to host html using github pages"}))
-        self.client().post('/api/v1/questions',
-                           headers=dict(Authorization="Bearer " + self.a_token2),
-                           content_type="application/json",
-                           data=json.dumps({"title": "Baby Shower",
-                                            "content": "How to throw a greate baby shower"}))
+class TestQuestions(BaseTest):
+    '''Class testing questions'''  
     def test_post_questions(self):
         '''test handling posting questions'''
         #successfull post question
@@ -114,7 +62,7 @@ class TestQuestions(unittest.TestCase):
         #test get single question
         result2 = self.client().get('/api/v1/questions/1')
         my_data2 = json.loads(result2.data)
-        self.assertEqual("Git branching", my_data2["title"])
+        self.assertEqual("Sample title 1", my_data2["title"])
         self.assertEqual(result2.status_code, 200)
         #test missing question
         result3 = self.client().get('/api/v1/questions/10')
@@ -145,7 +93,7 @@ class TestQuestions(unittest.TestCase):
         current_length = len(my_data)
 
         result2 = self.client().delete('/api/v1/questions/2',
-                                       headers=dict(Authorization="Bearer " + self.a_token2))
+                                       headers=dict(Authorization="Bearer " + self.a_token))
         my_data2 = json.loads(result2.data)
         self.assertEqual("Question #2 Deleted Successfully", my_data2["message"])
         self.assertEqual(result2.status_code, 200)
@@ -178,7 +126,7 @@ class TestQuestions(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
         #test limit
         result2 = self.client().get('/api/v1/users/questions?limit=1',
-                                    headers=dict(Authorization="Bearer " + self.a_token2))
+                                    headers=dict(Authorization="Bearer " + self.a_token))
         my_data2 = json.loads(result2.data)
         self.assertEqual(len(my_data2), 1)
         self.assertEqual(result2.status_code, 200)
@@ -194,14 +142,14 @@ class TestQuestions(unittest.TestCase):
         #successfull serach by title
         result = self.client().post('/api/v1/questions/search?limit=10',
                                     content_type="application/json",
-                                    data=json.dumps({"content":"Git branching"}))
+                                    data=json.dumps({"content":"Sample title 1"}))
         my_data = json.loads(result.data)
         self.assertEqual(result.status_code, 200)
-        self.assertEqual("Git branching", my_data["title"])
+        self.assertEqual("Sample title 1", my_data["title"])
         #successful search return closest matches
         result2 = self.client().post('/api/v1/questions/search?limit=10',
                                      content_type="application/json",
-                                     data=json.dumps({"content":"git branch"}))
+                                     data=json.dumps({"content":"sample title"}))
         my_data2 = json.loads(result2.data)
         self.assertEqual(result2.status_code, 200)
         self.assertGreater(len(my_data2), 0)
@@ -240,12 +188,3 @@ class TestQuestions(unittest.TestCase):
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
         self.assertEqual("Content field missing", my_data7["message"])
-
-    def tearDown(self):
-        current_environemt = os.environ['ENV']
-        conn_string = app_config[current_environemt].CONNECTION_STRING
-        conn = psycopg2.connect(conn_string)
-        cursor = conn.cursor()
-        cursor.execute("DROP TABLE votes, comments, answers, questions, revoked_tokens, users")
-        conn.commit()
-        conn.close()

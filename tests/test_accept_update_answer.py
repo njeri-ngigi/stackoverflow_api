@@ -1,51 +1,9 @@
 '''tests/test_accept_update_answer.py'''
-import os
-import unittest
 import json
-import psycopg2
-from app.application import create_app
-from instance.config import app_config
+from tests.base_test import BaseTest
 
-class TestQuestionAnswers(unittest.TestCase):
-    '''Class Testing Question Answers'''
-    def setUp(self):
-        self.app = create_app(config_name="testing")
-        self.client = self.app.test_client
-
-        #signup 2 users
-        self.client().post('/api/v1/auth/signup',
-                           content_type="application/json",
-                           data=json.dumps({"name": "Njeri", "username": "njery",
-                                            "email": "njeri@to.com", "password": "Test123",
-                                            "confirm_password": "Test123"}))
-        self.client().post('/api/v1/auth/signup',
-                           content_type="application/json",
-                           data=json.dumps({"name": "Suite", "username": "suite",
-                                            "email": "suite@to.com", "password": "Test123",
-                                            "confirm_password": "Test123"}))
-        #login in both users
-        res = self.client().post('/api/v1/auth/login', content_type="application/json",
-                                 data=json.dumps({"username": "njery", "password": "Test123"}))
-        u_data = json.loads(res.data)
-        self.a_token = u_data["token"]
-
-        res2 = self.client().post('/api/v1/auth/login', content_type="application/json",
-                                  data=json.dumps({"username": "suite", "password": "Test123"}))
-        u_data2 = json.loads(res2.data)
-        self.a_token2 = u_data2["token"]
-
-        #user1 posts a questions
-        self.client().post('/api/v1/questions',
-                           headers=dict(Authorization="Bearer " + self.a_token),
-                           content_type="application/json",
-                           data=json.dumps({"title": "Sample title",
-                                            "content": "Sample content"}))
-        #user2 posts answer
-        self.client().post('/api/v1/questions/1/answers',
-                           headers=dict(Authorization="Bearer " + self.a_token2),
-                           content_type="application/json",
-                           data=json.dumps({"content": "Sample answer 1"}))
-
+class TestQuestionAnswers(BaseTest):
+    '''Class Testing Question Answers'''    
     def test_accept_update_answer(self):
         '''test accepting and updating answer'''
         #test successful accept answer
@@ -113,12 +71,3 @@ class TestQuestionAnswers(unittest.TestCase):
         my_data8 = json.loads(result8.data)
         self.assertEqual(result8.status_code, 400)
         self.assertEqual("Content field missing", my_data8["message"])
-
-    def tearDown(self):
-        current_environemt = os.environ['ENV']
-        conn_string = app_config[current_environemt].CONNECTION_STRING
-        conn = psycopg2.connect(conn_string)
-        cursor = conn.cursor()
-        cursor.execute("DROP TABLE votes, comments, answers, questions, revoked_tokens, users")
-        conn.commit()
-        conn.close()

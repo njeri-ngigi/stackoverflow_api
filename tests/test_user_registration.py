@@ -1,17 +1,9 @@
 '''tests/test_user_registration.py'''
-import os
-import unittest
 import json
-import psycopg2
-from app.application import create_app
-from instance.config import app_config
+from tests.base_test import BaseTest
 
-class RegisterUserTestCase(unittest.TestCase):
+class RegisterUserTestCase(BaseTest):
     '''Class testing user registration, login and logout'''
-    def setUp(self):
-        self.app = create_app(config_name="testing")
-        self.client = self.app.test_client
-
     def test_register_user(self):
         '''Test handling user registration'''
         #test successful registration
@@ -182,12 +174,3 @@ class RegisterUserTestCase(unittest.TestCase):
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
         self.assertEqual("Username or password fields missing", my_data7["message"])
-        
-    def tearDown(self):
-        current_environemt = os.environ['ENV']
-        conn_string = app_config[current_environemt].CONNECTION_STRING
-        conn = psycopg2.connect(conn_string)
-        cursor = conn.cursor()
-        cursor.execute("DROP TABLE votes, comments, answers, questions, revoked_tokens, users")
-        conn.commit()
-        conn.close()
