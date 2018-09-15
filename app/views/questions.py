@@ -154,33 +154,24 @@ class QuestionsAnswersId(Resource):
 
 class QuestionsAnswersUpvote(Resource):
     '''class represting upvoting an answer'''
-    @classmethod
+    def __init__(self):
+        self.action = "upvote"
     @jwt_required
-    def post(cls, question_id, answer_id):
+    def post(self, question_id, answer_id):
         '''post method (upvote answer)'''
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
         username = get_jwt_identity()
         my_answer = AnswersModel()
-        result = my_answer.upvote_or_downvote(q_id, a_id, username, "upvote")
+        result = my_answer.upvote_or_downvote(q_id, a_id, username, self.action)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         return result, 200
 
-class QuestionsAnswersDownvote(Resource):
+class QuestionsAnswersDownvote(QuestionsAnswersUpvote):
     '''class represting downvoting an answer'''
-    @classmethod
-    @jwt_required
-    def post(cls, question_id, answer_id):
-        '''post method (downvote answer)'''
-        q_id = ast.literal_eval(question_id)
-        a_id = ast.literal_eval(answer_id)
-        username = get_jwt_identity()
-        my_answer = AnswersModel()
-        result = my_answer.upvote_or_downvote(q_id, a_id, username, "downvote")
-        if "error" in result:
-            return dict(message=result["message"]), result["error"]
-        return result, 200
+    def __init__(self):
+        self.action = "downvote"
 
 class UserQuestions(Resource):
     '''class representing get all user questions'''
