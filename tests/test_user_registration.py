@@ -49,7 +49,7 @@ class RegisterUserTestCase(unittest.TestCase):
                                      data=json.dumps({}))
         my_data3 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 400)
-        self.assertEqual("Fields cannot be empty", my_data3["message"])
+        self.assertEqual("Field(s) cannot be empty", my_data3["message"])
         #test missing data fields
         result5 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
@@ -174,7 +174,7 @@ class RegisterUserTestCase(unittest.TestCase):
                                     data=json.dumps({}))
         my_data6 = json.loads(result6.data)
         self.assertEqual(result6.status_code, 400)
-        self.assertEqual("Please enter username and password", my_data6["message"])
+        self.assertEqual("Field(s) cannot be empty", my_data6["message"])
         #test empty content
         result7 = self.client().post('/api/v1/auth/login',
                                     content_type="application/json",

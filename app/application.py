@@ -19,9 +19,28 @@ def create_app(config_name):
 
     SetupDB(config_name)
 
+    errors = {
+    'PageNotFound': {
+        'message': "Page not found",
+        'status': 404,
+    },
+    'BadRequest': {
+        'message': "Bad Request",
+        'status': 400,
+    },
+    'UnauthorizedMethod': {
+        'message': "Method not allowed",
+        'status': 401,
+    },
+    'ServerError': {
+        'message': "Internal Server Error",
+        'status': 500,
+    }
+}
+
     app = Flask(__name__)
     CORS(app)
-    api = Api(app)
+    api = Api(app, errors=errors, catch_all_404s=True)
 
     app.url_map.strict_slashes = False
     app.config.from_object(app_config[config_name])

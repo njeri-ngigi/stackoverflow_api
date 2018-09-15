@@ -7,30 +7,29 @@ from app.views.validate import Validate
 from app.models.user_model import User
 from app.models.revoked_token_model import RevokedTokens
 
+validate = Validate()
+
 class Signup(Resource):
     '''Class representing user registration'''
     @classmethod
     def post(cls):
         '''post (signup method)'''
         data = request.get_json()
-        if not data:
-            return dict(message="Fields cannot be empty"), 400
+        result = validate.check_for_data(data)
+        if result:
+            return result, 400
         username = data.get("username")
         name = data.get("name")
         email = data.get("email")
         password = data.get("password")
         confirm_password = data.get("confirm_password")
-
         if not username or not name or not email or not password or not confirm_password:
             return dict(
                 message="name, username, email, password or confirm_password fields missing"), 400
-        u_valid = Validate()
         passwords = [password, confirm_password]
-        result = u_valid.validate_register(username, name, email, passwords)
-
+        result = validate.validate_register(username, name, email, passwords)
         if "message" in result:
             return result, 400
-
         my_user = User()
         result = my_user.add_user(name, username, email, password)
         if "error" in result:
@@ -43,8 +42,9 @@ class Login(Resource):
     def post(cls):
         '''post (login) method'''
         data = request.get_json()
-        if not data:
-            return dict(message="Please enter username and password"), 400
+        result = validate.check_for_data(data)
+        if result:
+            return result, 400
         username = data.get("username")
         password = data.get("password")
         if not username or not password:
