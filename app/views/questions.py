@@ -135,12 +135,11 @@ class QuestionsAnswersId(Resource):
         a_id = ast.literal_eval(answer_id)
         username = get_jwt_identity()
         content = ""
-        action = "accept"
+        action = ""
         if data:
             content = data.get("content")
             if not content:
                 return dict(message="Please enter answer content"), 400
-
             content = content.strip()
             if not content:
                 return dict(message="Enter valid data. Look out for whitespaces in fields."), 400

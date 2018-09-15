@@ -14,16 +14,14 @@ def bad_request(_error):
 def page_not_found(_error):
     '''Page not found'''
     return jsonify(dict(error='Page not found')), 404
-
+@app.errorhandler(500)
+def internal_server_error(_error):
+    '''Internal server error'''
+    return jsonify(dict(error='Internal server error')), 500
 @app.errorhandler(405)
 def unauthorized_method(_error):
     '''Unauthorized method'''
     return jsonify(dict(error='Method not allowed')), 405
-
-@app.errorhandler(500)
-def server_error(_error):
-    '''Internal server error'''
-    return jsonify(dict(error='Internal server error')), 500
 
 @app.route('/')
 def home():
