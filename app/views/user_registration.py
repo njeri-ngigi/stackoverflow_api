@@ -25,7 +25,8 @@ class Signup(Resource):
             return dict(
                 message="name, username, email, password or confirm_password fields missing"), 400
         u_valid = Validate()
-        result = u_valid.validate_register(username, name, email, password, confirm_password)
+        passwords = [password, confirm_password]
+        result = u_valid.validate_register(username, name, email, passwords)
 
         if "message" in result:
             return result, 400
