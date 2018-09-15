@@ -97,7 +97,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                      data=json.dumps({"content": "  "}))
         my_data4 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 400)
-        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data4["message"])
+        self.assertEqual("Enter valid data. Look out for whitespaces in field(s).", my_data4["message"])
         #test missing input data
         result5 = self.client().post('/api/v1/questions/20/answers',
                                      headers=dict(Authorization="Bearer " + self.a_token2),
@@ -113,7 +113,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                      data=json.dumps({"content": ""}))
         my_data6 = json.loads(result6.data)
         self.assertEqual(result6.status_code, 400)
-        self.assertEqual("Please enter answer content", my_data6["message"])
+        self.assertEqual("Content field missing", my_data6["message"])
 
     def test_get_all_question_answers(self):
         '''test handling getting all answers to a question'''

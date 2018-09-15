@@ -103,7 +103,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                     data=json.dumps({"content": "  "}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
-        self.assertEqual("Enter valid data. Look out for whitespaces in fields.",
+        self.assertEqual("Enter valid data. Look out for whitespaces in field(s).",
                          my_data7["message"])
         #missing input content field
         result8 = self.client().put('/api/v1/questions/1/answers/1',
@@ -112,7 +112,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                     data=json.dumps({"content": ""}))
         my_data8 = json.loads(result8.data)
         self.assertEqual(result8.status_code, 400)
-        self.assertEqual("Please enter answer content", my_data8["message"])
+        self.assertEqual("Content field missing", my_data8["message"])
 
     def tearDown(self):
         current_environemt = os.environ['ENV']

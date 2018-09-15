@@ -125,7 +125,7 @@ class RegisterUserTestCase(unittest.TestCase):
                                                       "confirm_password": "Test123"}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
-        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data7["message"])
+        self.assertEqual("Enter valid data. Look out for whitespaces in field(s).", my_data7["message"])
 
     def test_login_logout(self):
         '''Test user login and logout'''

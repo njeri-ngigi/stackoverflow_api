@@ -61,7 +61,7 @@ class TestQuestionAnswers(unittest.TestCase):
                            data=json.dumps({"content": "Sample comment"}))
 
     def test_post_answer(self):
-        '''test handling posting answers'''
+        '''test handling posting comments'''
         #test successful post comment
         result = self.client().post('/api/v1/questions/1/answers/1/comments',
                                     headers=dict(Authorization="Bearer " + self.a_token3),
@@ -85,7 +85,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                      data=json.dumps({}))
         my_data3 = json.loads(result3.data)
         self.assertEqual(result3.status_code, 400)
-        self.assertEqual("Field cannot be empty", my_data3["message"])
+        self.assertEqual("Field(s) cannot be empty", my_data3["message"])
         #test missing content
         result4 = self.client().post('/api/v1/questions/1/answers/1/comments',
                                      headers=dict(Authorization="Bearer " + self.a_token3),
@@ -93,7 +93,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                      data=json.dumps({"content": ""}))
         my_data4 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 400)
-        self.assertEqual("Please enter content", my_data4["message"])
+        self.assertEqual("Content field missing", my_data4["message"])
         #test whitespaces
         result5 = self.client().post('/api/v1/questions/1/answers/1/comments',
                                      headers=dict(Authorization="Bearer " + self.a_token3),
@@ -101,7 +101,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                      data=json.dumps({"content": "  "}))
         my_data5 = json.loads(result5.data)
         self.assertEqual(result5.status_code, 400)
-        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data5["message"])
+        self.assertEqual("Enter valid data. Look out for whitespaces in field(s).", my_data5["message"])
         #test non-existent question
         result6 = self.client().post('/api/v1/questions/10/answers/1/comments',
                                      headers=dict(Authorization="Bearer " + self.a_token3),
@@ -203,7 +203,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                     data=json.dumps({}))
         my_data6 = json.loads(result6.data)
         self.assertEqual(result6.status_code, 400)
-        self.assertEqual("Field cannot be empty", my_data6["message"])
+        self.assertEqual("Field(s) cannot be empty", my_data6["message"])
         #test missing content
         result7 = self.client().put('/api/v1/questions/1/answers/1/comments/1',
                                     headers=dict(Authorization="Bearer " + self.a_token3),
@@ -211,7 +211,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                     data=json.dumps({"content": ""}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
-        self.assertEqual("Please enter content", my_data7["message"])
+        self.assertEqual("Content field missing", my_data7["message"])
         #test whitespaces
         result8 = self.client().put('/api/v1/questions/1/answers/1/comments/1',
                                     headers=dict(Authorization="Bearer " + self.a_token3),
@@ -219,7 +219,7 @@ class TestQuestionAnswers(unittest.TestCase):
                                     data=json.dumps({"content": "  "}))
         my_data8 = json.loads(result8.data)
         self.assertEqual(result8.status_code, 400)
-        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data8["message"])
+        self.assertEqual("Enter valid data. Look out for whitespaces in field(s).", my_data8["message"])
 
     def tearDown(self):
         current_environemt = os.environ['ENV']

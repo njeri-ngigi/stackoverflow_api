@@ -85,7 +85,7 @@ class TestQuestions(unittest.TestCase):
                                                       "content": "  "}))
         my_data3 = json.loads(result3.data)
         self.assertEqual(result3.status_code, 400)
-        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data3["message"])
+        self.assertEqual("Enter valid data. Look out for whitespaces in field(s).", my_data3["message"])
         #test empty input fields
         result4 = self.client().post('/api/v1/questions',
                                      headers=dict(Authorization="Bearer " + self.a_token),
@@ -93,7 +93,7 @@ class TestQuestions(unittest.TestCase):
                                      data=json.dumps({}))
         my_data4 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 400)
-        self.assertEqual("Fields cannot be empty", my_data4["message"])
+        self.assertEqual("Field(s) cannot be empty", my_data4["message"])
         #test for missing content and title
         result5 = self.client().post('/api/v1/questions',
                                      headers=dict(Authorization="Bearer " + self.a_token),
@@ -225,21 +225,21 @@ class TestQuestions(unittest.TestCase):
                                      data=json.dumps({"content":"  "}))
         my_data5 = json.loads(result5.data)
         self.assertEqual(result5.status_code, 400)
-        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data5["message"])
+        self.assertEqual("Enter valid data. Look out for whitespaces in field(s).", my_data5["message"])
         #test empty input fields
         result6 = self.client().post('/api/v1/questions/search?limit=10',
                                      content_type="application/json",
                                      data=json.dumps({}))
         my_data6 = json.loads(result6.data)
         self.assertEqual(result6.status_code, 400)
-        self.assertEqual("Field cannot be empty", my_data6["message"])
+        self.assertEqual("Field(s) cannot be empty", my_data6["message"])
         #test for missing content and title
         result7 = self.client().post('/api/v1/questions/search?limit=10',
                                      content_type="application/json",
                                      data=json.dumps({"content":""}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
-        self.assertEqual("Please enter content", my_data7["message"])
+        self.assertEqual("Content field missing", my_data7["message"])
 
     def tearDown(self):
         current_environemt = os.environ['ENV']
