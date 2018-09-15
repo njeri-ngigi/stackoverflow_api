@@ -1,20 +1,11 @@
 '''app/models/questions_model.py'''
-import os
 from difflib import get_close_matches
 from itertools import chain
 import psycopg2
-from instance.config import app_config
+from app.models.base_models import BaseModel
 
-CURRENT_ENVIRONMENT = os.environ['ENV']
-CONN_STRING = app_config[CURRENT_ENVIRONMENT].CONNECTION_STRING
-
-class QuestionsModel(object):
+class QuestionsModel(BaseModel):
     '''questions class model'''
-    def __init__(self):
-        '''set up class variables'''
-        self.conn = psycopg2.connect(CONN_STRING)
-        self.cursor = self.conn.cursor()
-
     def post_question(self, title, content, username):
         '''Post a question'''
         self.cursor.execute("SELECT * FROM questions WHERE q_title = (%s);", (title, ))

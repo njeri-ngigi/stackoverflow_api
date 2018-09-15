@@ -1,18 +1,9 @@
 '''app/models/answers_model.py'''
-import os
 import psycopg2
-from instance.config import app_config
+from app.models.base_models import BaseModel
 
-CURRENT_ENVIRONMENT = os.environ['ENV']
-CONN_STRING = app_config[CURRENT_ENVIRONMENT].CONNECTION_STRING
-
-class AnswersModel(object):
+class AnswersModel(BaseModel):
     '''answers class model'''
-    def __init__(self):
-        '''open database connections'''
-        self.conn = psycopg2.connect(CONN_STRING)
-        self.cursor = self.conn.cursor()
-
     def check_if_question_exists(self, question_id):
         '''helper method to check if a question exists'''
         self.cursor.execute("SELECT * FROM questions WHERE question_id = (%s);", (question_id,))
