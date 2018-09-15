@@ -109,18 +109,18 @@ class AnswersModel(object):
         if not result:
             self.conn.close()
             return dict(message="Question doesn't exist", error=404)
-        result2 = self.check_if_answer_exists(answer_id)
-        if not result2:
+        result = self.check_if_answer_exists(answer_id)
+        if not result:
             self.conn.close()
             return dict(message="This answer doesn't exist", error=404)
-        if username == result2[3]:
+        if username == result[3]:
             self.conn.close()
             return dict(message="You cannot vote on your own answer.", error=401)
         self.cursor.execute("SELECT vote FROM votes WHERE v_username = (%s)", (username,))
-        result4 = self.cursor.fetchone()
+        result2 = self.cursor.fetchone()
         user_vote = 0
-        if result4:
-            user_vote = result4[0]
+        if result2:
+            user_vote = result2[0]
         self.cursor.execute("SELECT upvotes FROM answers WHERE answer_id = (%s);", (answer_id,))
         upvotes = self.cursor.fetchone()[0]
         self.cursor.execute("SELECT downvotes FROM answers WHERE answer_id = (%s);", (answer_id,))
