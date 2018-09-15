@@ -84,7 +84,6 @@ class QuestionsAnswers(Resource):
     @jwt_required
     def post(cls, question_id):
         '''post an answer'''
-        error = {}
         data = request.get_json()
         result = validate.check_for_data(data)
         if not result:
@@ -103,8 +102,7 @@ class QuestionsAnswers(Resource):
                     if "error" in result2:
                         return dict(message=result2["message"]), result2["error"]
                     return result2, 201
-        error.update(result)
-        return error, 400
+        return result, 400
 
     @classmethod
     def get(cls, question_id):
@@ -202,17 +200,15 @@ class SearchQuestion(Resource):
         limit = ast.literal_eval(limit)
         data = request.get_json()
         result = validate.check_for_data(data)
-        if result:
-            return result, 400
-        content = data.get("content")
-        result = validate.check_for_content([content])
-        if result:
-            return result, 400
-        result = validate.check_for_white_spaces([content])
-        if result:
-            return result, 400
-        my_question = QuestionsModel()
-        result = my_question.search_question(content, limit)
-        if "error" in result:
-            return dict(message=result["message"]), result["error"]
-        return result, 200
+        if not result:
+            content = data.get("content")
+            result = validate.check_for_content([content])
+            if not result:
+                result = validate.check_for_white_spaces([content])
+                if not result:
+                    my_question = QuestionsModel()
+                    result2 = my_question.search_question(content, limit)
+                    if "error" in result2:
+                        return dict(message=result2["message"]), result2["error"]
+                    return result2, 200
+        return result, 400
