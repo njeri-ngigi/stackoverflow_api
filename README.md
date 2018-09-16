@@ -31,7 +31,15 @@ The api provides endpoints for signup, login, logout, retrieve all or a single q
       virtualenv
       python 3
       postgresql
+      PgAdmin (Optional)
 ## Setting up database
+#### To create the databases through the command line:
+      ```
+      $ psql postgres
+      postgres=# CREATE DATABASE db_stackoverflow_lite;
+      postgres=# CREATE DATABASE testdb;
+      ```
+#### Alternatively use PgAdmin:
       Open Postgres PgAdmin and create 2 databases test_db and db_stackoverflow_lite
 ## Installation
    clone repo:
