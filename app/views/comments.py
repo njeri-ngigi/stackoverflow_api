@@ -18,24 +18,16 @@ class AnswerComments(Resource):
         username = get_jwt_identity()
         data = request.get_json()
         result = validate.check_for_data(data)
-        if result:
-            return result, 400
-        content = data.get("content")
-        result = validate.check_for_content([content])
-        if result:
-            return result, 400
-        result = validate.check_for_white_spaces([content])
-        if result:
-            return result, 400
-        my_answer = AnswersModel()
-        result = my_answer.post_comment(q_id, a_id, username, content)
-        if "question_id" in result:
-            return dict(message=result["message"], question_id=result["question_id"],
-                        answer_id=result["answer_id"],
-                        comment_id=result["comment_id"]), result["error"]
-        if "error" in result:
-            return dict(message=result["message"]), result["error"]
-        return result, 201
+        if not result:
+            content = data.get("content")
+            result = validate.check_for_content([content])
+            if not result:
+                result = validate.check_for_white_spaces([content])
+                if not result:
+                    my_answer = AnswersModel()
+                    result2 = my_answer.post_comment(q_id, a_id, username, content)
+                    return result2["response"], result2["status_code"]
+        return result, 400
 
     @classmethod
     def get(cls, question_id, answer_id):
@@ -47,8 +39,8 @@ class AnswerComments(Resource):
             limit = ast.literal_eval(limit)
         my_answer = AnswersModel()
         result = my_answer.get_answer_comments(q_id, a_id, limit)
-        if "error" in result:
-            return dict(message=result["message"]), result["error"]
+        if "status_code" in result:
+            return result["response"], result["status_code"]
         all_comments = []
         for i in result:
             all_comments.append({i[2]:i[3]})
@@ -66,17 +58,13 @@ class AnswerCommentsId(Resource):
         username = get_jwt_identity()
         data = request.get_json()
         result = validate.check_for_data(data)
-        if result:
-            return result, 400
-        content = data.get("content")
-        result = validate.check_for_content([content])
-        if result:
-            return result, 400
-        result = validate.check_for_white_spaces([content])
-        if result:
-            return result, 400
-        my_answer = AnswersModel()
-        result = my_answer.update_comment(q_id, a_id, c_id, username, content)
-        if "error" in result:
-            return dict(message=result["message"]), result["error"]
-        return result, 200
+        if not result:            
+            content = data.get("content")
+            result = validate.check_for_content([content])
+            if not result:
+                result = validate.check_for_white_spaces([content])
+                if not result:            
+                    my_answer = AnswersModel()
+                    result2 = my_answer.update_comment(q_id, a_id, c_id, username, content)
+                    return result2["response"], result2["status_code"]
+        return result, 400

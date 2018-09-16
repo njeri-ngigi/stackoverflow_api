@@ -46,10 +46,7 @@ class Questions(Resource):
                     username = get_jwt_identity()
                     my_question = QuestionsModel()
                     result2 = my_question.post_question(title, content, username)
-                    if "error" in result2:
-                        return dict(message=result2["message"],
-                                    question_id=result2["question_id"]), result2["error"]
-                    return result2, 201
+                    return result2["response"], result2["status_code"]
         return result, 400
 
 class QuestionsQuestionId(Resource):
@@ -60,9 +57,7 @@ class QuestionsQuestionId(Resource):
         q_id = ast.literal_eval(question_id)
         my_question = QuestionsModel()
         result = my_question.get_single_question(q_id)
-        if "message" in result:
-            return dict(message=result["message"]), result["error"]
-        return dict(title=result[1], content=result[2], username=result[3]), 200
+        return result["response"], result["status_code"]
 
     @classmethod
     @jwt_required
@@ -72,9 +67,7 @@ class QuestionsQuestionId(Resource):
         q_id = ast.literal_eval(question_id)
         my_question = QuestionsModel()
         result = my_question.delete_question(q_id, username)
-        if "error" in result:
-            return dict(message=result["message"]), result["error"]
-        return result, 200
+        return result["response"], result["status_code"]
 
 class QuestionsAnswers(Resource):
     '''Class representing posting an answer endpoint'''
@@ -94,12 +87,7 @@ class QuestionsAnswers(Resource):
                     q_id = ast.literal_eval(question_id)
                     my_answer = AnswersModel()
                     result2 = my_answer.post_answer(q_id, content, username)
-                    if "question_id" in result2:
-                        return dict(message=result2["message"], question_id=result2["question_id"],
-                                    answer_id=result2["answer_id"]), result2["error"]
-                    if "error" in result2:
-                        return dict(message=result2["message"]), result2["error"]
-                    return result2, 201
+                    return result2["response"], result2["status_code"]
         return result, 400
 
     @classmethod
@@ -144,9 +132,7 @@ class QuestionsAnswersId(Resource):
             action = "update"
         my_answer = AnswersModel()
         result = my_answer.update_or_accept_answer(q_id, a_id, username, content, action)
-        if "error" in result:
-            return dict(message=result["message"]), result["error"]
-        return result, 200
+        return result["response"], result["status_code"]
 
 class QuestionsAnswersUpvote(Resource):
     '''class represting upvoting an answer'''
@@ -160,9 +146,7 @@ class QuestionsAnswersUpvote(Resource):
         username = get_jwt_identity()
         my_answer = AnswersModel()
         result = my_answer.upvote_or_downvote(q_id, a_id, username, self.action)
-        if "error" in result:
-            return dict(message=result["message"]), result["error"]
-        return result, 200
+        return result["response"], result["status_code"]
 
 class QuestionsAnswersDownvote(QuestionsAnswersUpvote):
     '''class represting downvoting an answer'''
@@ -206,7 +190,5 @@ class SearchQuestion(Resource):
                 if not result:
                     my_question = QuestionsModel()
                     result2 = my_question.search_question(content, limit)
-                    if "error" in result2:
-                        return dict(message=result2["message"]), result2["error"]
-                    return result2, 200
+                    return result2["response"], result2["status_code"]
         return result, 400
