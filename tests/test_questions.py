@@ -146,6 +146,18 @@ class TestQuestions(BaseTest):
         my_data3 = json.loads(result3.data)
         self.assertEqual(result3.status_code, 200)
         self.assertEqual(len(my_data3), 0)
+        #test pagination
+        result4 = self.client().get('/api/v1/users/questions?pages=1',
+                                    headers=dict(Authorization="Bearer " + self.a_token))
+        my_data4 = json.loads(result4.data)
+        self.assertEqual(result4.status_code, 200)
+        self.assertGreaterEqual(len(my_data4), 0)
+        #test empty pages
+        result5 = self.client().get('/api/v1/users/questions?pages=3',
+                                    headers=dict(Authorization="Bearer " + self.a_token))
+        my_data5 = json.loads(result5.data)
+        self.assertEqual(result5.status_code, 200)
+        self.assertEqual(len(my_data5), 0)
 
     def test_search_question(self):
         '''test searching questions'''
