@@ -2,5 +2,5 @@
 from app.views.user_registration import Signup, Login, Logout
 from app.views.questions import (Questions, QuestionsQuestionId, QuestionsAnswers,
                                  QuestionsAnswersId, QuestionsAnswersUpvote,
-                                 QuestionsAnswersDownvote, UserQuestions, AnswerComments,
-                                 AnswerCommentsId, SearchQuestion)
+                                 QuestionsAnswersDownvote, UserQuestions, SearchQuestion)
+from app.views.comments import (AnswerComments, AnswerCommentsId)

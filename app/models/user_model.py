@@ -1,19 +1,10 @@
 '''app/models.user_model.py'''
-import os
 from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
-from instance.config import app_config
+from app.models.base_models import BaseModel
 
-CURRENT_ENVIRONMENT = os.environ['ENV']
-CONN_STRING = app_config[CURRENT_ENVIRONMENT].CONNECTION_STRING
-
-class User(object):
+class User(BaseModel):
     '''User class model'''
-    def __init__(self):
-        '''set up class variables'''
-        self.conn = psycopg2.connect(CONN_STRING)
-        self.cursor = self.conn.cursor()
-
     def add_user(self, name, username, email, password):
         '''Add a user'''
         pw_hash = generate_password_hash(password)

@@ -17,11 +17,12 @@ def create_app(config_name):
                            AnswerComments, AnswerCommentsId, SearchQuestion)
     from app.models.revoked_token_model import RevokedTokens
 
-    SetupDB(config_name)
+    my_db = SetupDB(config_name)
+    my_db.create_db()
 
     app = Flask(__name__)
     CORS(app)
-    api = Api(app)
+    api = Api(app, catch_all_404s=True)
 
     app.url_map.strict_slashes = False
     app.config.from_object(app_config[config_name])
