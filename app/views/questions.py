@@ -6,6 +6,7 @@ from flask_jwt_extended import (jwt_required, get_jwt_identity)
 
 from app.models.questions_model import QuestionsModel
 from app.models.answers_model import AnswersModel
+from app.models.vote_model import VoteModel
 from app.views.validate import Validate
 
 validate = Validate()
@@ -144,8 +145,8 @@ class QuestionsAnswersUpvote(Resource):
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
         username = get_jwt_identity()
-        my_answer = AnswersModel()
-        result = my_answer.upvote_or_downvote(q_id, a_id, username, self.action)
+        my_vote = VoteModel()
+        result = my_vote.upvote_or_downvote(q_id, a_id, username, self.action)
         return result["response"], result["status_code"]
 
 class QuestionsAnswersDownvote(QuestionsAnswersUpvote):
