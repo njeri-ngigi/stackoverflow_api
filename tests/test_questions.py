@@ -84,6 +84,16 @@ class TestQuestions(BaseTest):
         my_data6 = json.loads(result6.data)
         self.assertGreaterEqual(len(my_data6), 0)
         self.assertEqual(result6.status_code, 200)
+        #test pagination
+        result7 = self.client().get('/api/v1/questions?pages=1')
+        my_data7 = json.loads(result7.data)
+        self.assertEqual(result7.status_code, 200)
+        self.assertGreaterEqual(len(my_data7), 0)
+        #test empty pages
+        result8 = self.client().get('/api/v1/questions?pages=3')
+        my_data8 = json.loads(result8.data)
+        self.assertEqual(result8.status_code, 200)
+        self.assertEqual(len(my_data8), 0)
 
     def test_delete_questions(self):
         '''test deleting questions'''

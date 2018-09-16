@@ -78,4 +78,13 @@ class TestQuestionAnswers(BaseTest):
         my_data4 = json.loads(result4.data)
         self.assertEqual(len(my_data4), 1)
         self.assertEqual(result4.status_code, 200)
+        #test pagination
+        result5 = self.client().get('/api/v1/questions/1/answers?pages=1')
+        my_data5 = json.loads(result5.data)
+        self.assertEqual(result5.status_code, 200)
+        #test empty pages
+        result6 = self.client().get('/api/v1/questions/1/answers?pages=3')
+        my_data6 = json.loads(result6.data)
+        self.assertEqual(result6.status_code, 200)
+        self.assertEqual(len(my_data6), 0)
         

@@ -97,6 +97,20 @@ class TestQuestionAnswers(BaseTest):
         my_data4 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 200)
         self.assertEqual(len(my_data4), 2)
+        #test pagination
+        self.client().post('/api/v1/questions/1/answers/1/comments',
+                           headers=dict(Authorization="Bearer " + self.a_token3),
+                           content_type="application/json",
+                           data=json.dumps({"content": "Sample comment4"}))
+        result5 = self.client().get('/api/v1/questions/1/answers/1/comments?pages=1')
+        my_data5 = json.loads(result5.data)
+        self.assertEqual(result5.status_code, 200)
+        self.assertEqual(len(my_data5), 5)
+        #test empty pages
+        result6 = self.client().get('/api/v1/questions/1/answers/1/comments?pages=3')
+        my_data6 = json.loads(result6.data)
+        self.assertEqual(result6.status_code, 200)
+        self.assertEqual(len(my_data6), 0)
 
     def test_update_comment(self):
         '''test updating comments'''
