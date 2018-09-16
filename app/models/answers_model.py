@@ -34,7 +34,7 @@ class AnswersModel(BaseModel):
         self.conn.close()
         return dict(response=dict(message="Answer Posted!"), status_code=201)
 
-    def get_all_answers_to_question(self, question_id, limit=None):
+    def get_all_answers_to_question(self, question_id, limit=None, pages=None):
         '''get all answers to a question'''
         result = self.check_if_question_exists(question_id)
         if type(result) != bool:
@@ -43,9 +43,10 @@ class AnswersModel(BaseModel):
         self.cursor.execute("SELECT * FROM answers WHERE q_id = (%s) ORDER BY accepted DESC;", (question_id,))
         if limit:
             result2 = self.cursor.fetchmany(limit)
-            self.conn.close()
-            return result2
-        result2 = self.cursor.fetchall()
+        if not limit:
+            result2 = self.cursor.fetchall()
+        if pages:
+            result2 = self.paginate(result2, pages)
         self.conn.close()
         return result2
 
@@ -100,7 +101,7 @@ class AnswersModel(BaseModel):
                     result = dict(response=dict(message="Comment posted!"), status_code=201)
         self.conn.close()
         return result
-    def get_answer_comments(self, question_id, answer_id, limit=None):
+    def get_answer_comments(self, question_id, answer_id, limit=None, pages=None):
         '''get all comments for an answer'''
         result = self.check_if_question_exists(question_id)
         if type(result) == bool:
@@ -109,8 +110,10 @@ class AnswersModel(BaseModel):
                 self.cursor.execute("SELECT * FROM comments WHERE a_id = (%s);", (answer_id,))
                 if limit:
                     result2 = self.cursor.fetchmany(limit)
-                else:
+                if not limit:
                     result2 = self.cursor.fetchall()
+                if pages:
+                    result2 = self.paginate(result2, pages)
                 self.conn.close()
                 return result2
         self.conn.close()

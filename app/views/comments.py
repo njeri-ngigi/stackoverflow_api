@@ -33,12 +33,15 @@ class AnswerComments(Resource):
     def get(cls, question_id, answer_id):
         '''get all comments for an answer'''
         limit = request.args.get('limit')
+        pages = request.args.get('pages')
         q_id = ast.literal_eval(question_id)
         a_id = ast.literal_eval(answer_id)
         if limit:
             limit = ast.literal_eval(limit)
+        if pages:
+            pages = ast.literal_eval(pages)
         my_answer = AnswersModel()
-        result = my_answer.get_answer_comments(q_id, a_id, limit)
+        result = my_answer.get_answer_comments(q_id, a_id, limit, pages)
         if "status_code" in result:
             return result["response"], result["status_code"]
         all_comments = []

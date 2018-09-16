@@ -24,7 +24,7 @@ class QuestionsModel(BaseModel):
             return dict(response=dict(message="Failed to add question. Try again."), status_code=500)
         return dict(response=dict(message=title + ", Posted!"), status_code=201)
 
-    def get_all_questions(self, limit=None, most_answers=None):
+    def get_all_questions(self, limit=None, pages=None, most_answers=None):
         '''get all questions'''
         sql = "SELECT * FROM questions"
         if most_answers:
@@ -32,9 +32,10 @@ class QuestionsModel(BaseModel):
         self.cursor.execute(sql)
         if limit:
             result = self.cursor.fetchmany(limit)
-            self.conn.close()
-            return result
-        result = self.cursor.fetchall()
+        if not limit:
+            result = self.cursor.fetchall()
+        if pages:
+            result = self.paginate(result, pages)
         self.conn.close()
         return result
 
@@ -67,14 +68,15 @@ class QuestionsModel(BaseModel):
             return dict(response=dict(message="Failed to delete question. Try again."), status_code=500)
         return dict(response=dict(message="Question " + "#" + str(question_id) + " Deleted Successfully"), status_code=200)
 
-    def get_all_user_questions(self, username, limit=None):
+    def get_all_user_questions(self, username, limit=None, pages=None):
         '''get all questions a user has ever asked'''
         self.cursor.execute("SELECT * FROM questions WHERE q_username = (%s);", (username,))
         if limit:
             result = self.cursor.fetchmany(limit)
-            self.conn.close()
-            return result
-        result = self.cursor.fetchall()
+        if not limit:
+            result = self.cursor.fetchall()
+        if pages:
+            result = self.paginate(result, pages)
         self.conn.close()
         return result
 

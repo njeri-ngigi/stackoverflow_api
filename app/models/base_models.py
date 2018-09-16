@@ -27,4 +27,13 @@ class BaseModel(object):
         if not result:
             return dict(response=dict(message="This answer doesn't exist"), status_code=404)
         return result
+    
+    def paginate(self, my_list, page):
+        '''get a page of results'''
+        num = 5
+        end = num * page
+        start = end - 5
+        if start < 0:
+            start = 0
+        return my_list[start:end]
         

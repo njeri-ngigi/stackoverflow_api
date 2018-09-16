@@ -20,11 +20,14 @@ class Questions(Resource):
         if limit:
             limit = ast.literal_eval(limit)
         query = request.args.get('query')
+        pages = request.args.get('pages')
+        if pages:
+            pages = ast.literal_eval(pages)
         my_question = QuestionsModel()
         if query == "most_answers":
-            result = my_question.get_all_questions(limit, most_answers=True)
+            result = my_question.get_all_questions(limit,  pages, most_answers=True)
         else:
-            result = my_question.get_all_questions(limit)
+            result = my_question.get_all_questions(limit, pages)
         all_questions = []
         for i in result:
             question = dict(id=i[0], title=i[1], content=i[2], username=i[3], answers_given=i[5])
@@ -95,11 +98,14 @@ class QuestionsAnswers(Resource):
     def get(cls, question_id):
         '''get all answers to a question'''
         limit = request.args.get('limit')
+        pages = request.args.get('pages')
         if limit:
             limit = ast.literal_eval(limit)
+        if pages:
+            pages = ast.literal_eval(pages)
         q_id = ast.literal_eval(question_id)
         my_answer = AnswersModel()
-        result = my_answer.get_all_answers_to_question(q_id, limit)
+        result = my_answer.get_all_answers_to_question(q_id, limit, pages)
         if "error" in result:
             return dict(message=result["message"]), result["error"]
         all_answers = []
@@ -161,11 +167,14 @@ class UserQuestions(Resource):
     def get(cls):
         '''get all user's questions'''
         limit = request.args.get('limit')
+        pages = request.args.get('pages')
         if limit:
             limit = ast.literal_eval(limit)
+        if pages:
+            pages = ast.literal_eval(pages)
         username = get_jwt_identity()
         my_question = QuestionsModel()
-        result = my_question.get_all_user_questions(username, limit)
+        result = my_question.get_all_user_questions(username, limit, pages)
         all_questions = []
         for i in result:
             question = {"question_id": i[0], "title": i[1], "content": i[2], "answers": i[4]}
