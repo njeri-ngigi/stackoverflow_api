@@ -11,3 +11,20 @@ class BaseModel(object):
         '''open database connections'''
         self.conn = psycopg2.connect(CONN_STRING)
         self.cursor = self.conn.cursor()
+
+    def check_if_question_exists(self, question_id):
+        '''check if question exists'''
+        self.cursor.execute("SELECT * FROM questions WHERE question_id = (%s);", (question_id,))
+        result = self.cursor.fetchone()
+        if not result:
+            return dict(response=dict(message="Question doesn't exist"), status_code=404)
+        return True
+
+    def check_if_answer_exists(self, answer_id):
+        '''check if an answer exists'''
+        self.cursor.execute("SELECT * FROM answers WHERE answer_id = (%s);", (answer_id,))
+        result = self.cursor.fetchone()
+        if not result:
+            return dict(response=dict(message="This answer doesn't exist"), status_code=404)
+        return result
+        
