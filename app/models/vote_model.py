@@ -28,8 +28,7 @@ class VoteModel(BaseModel):
         if user_vote == 0:
             self.cursor.execute("INSERT INTO votes (a_id, v_username, vote) VALUES(%s, %s, %s);", (answer_id, username, -1))
         downvotes = downvotes + 1
-        self.cursor.execute("UPDATE answers SET downvotes = (%s) WHERE answer_id = (%s);", (downvotes, answer_id,))
-        
+        self.cursor.execute("UPDATE answers SET downvotes = (%s) WHERE answer_id = (%s);", (downvotes, answer_id,))  
                                 
     def upvote_or_downvote(self, question_id, answer_id, username, vote):
             '''upvote or downvote an answer'''
