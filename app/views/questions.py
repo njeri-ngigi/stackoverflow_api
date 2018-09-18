@@ -110,7 +110,7 @@ class QuestionsAnswers(Resource):
             return dict(message=result["message"]), result["error"]
         all_answers = []
         for i in result:
-            answer = {i[3]:i[2]}
+            answer = {"username":i[3], "content":i[2], "upvotes":i[5], "downvotes":i[6]}
             if i[4] == 1:
                 answer["accepted"] = "true"
             all_answers.append(answer)
