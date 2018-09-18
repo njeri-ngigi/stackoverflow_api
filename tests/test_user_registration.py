@@ -1,17 +1,9 @@
 '''tests/test_user_registration.py'''
-import os
-import unittest
 import json
-import psycopg2
-from app.application import create_app
-from instance.config import app_config
+from tests.base_test import BaseTest
 
-class RegisterUserTestCase(unittest.TestCase):
+class RegisterUserTestCase(BaseTest):
     '''Class testing user registration, login and logout'''
-    def setUp(self):
-        self.app = create_app(config_name="testing")
-        self.client = self.app.test_client
-
     def test_register_user(self):
         '''Test handling user registration'''
         #test successful registration
@@ -49,7 +41,7 @@ class RegisterUserTestCase(unittest.TestCase):
                                      data=json.dumps({}))
         my_data3 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 400)
-        self.assertEqual("Fields cannot be empty", my_data3["message"])
+        self.assertEqual("Field(s) cannot be empty", my_data3["message"])
         #test missing data fields
         result5 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
@@ -125,7 +117,7 @@ class RegisterUserTestCase(unittest.TestCase):
                                                       "confirm_password": "Test123"}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
-        self.assertEqual("Enter valid data. Look out for whitespaces in fields.", my_data7["message"])
+        self.assertEqual("Enter valid data. Look out for whitespaces in field(s).", my_data7["message"])
 
     def test_login_logout(self):
         '''Test user login and logout'''
@@ -174,7 +166,7 @@ class RegisterUserTestCase(unittest.TestCase):
                                     data=json.dumps({}))
         my_data6 = json.loads(result6.data)
         self.assertEqual(result6.status_code, 400)
-        self.assertEqual("Please enter username and password", my_data6["message"])
+        self.assertEqual("Field(s) cannot be empty", my_data6["message"])
         #test empty content
         result7 = self.client().post('/api/v1/auth/login',
                                     content_type="application/json",
@@ -182,12 +174,3 @@ class RegisterUserTestCase(unittest.TestCase):
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
         self.assertEqual("Username or password fields missing", my_data7["message"])
-        
-    def tearDown(self):
-        current_environemt = os.environ['ENV']
-        conn_string = app_config[current_environemt].CONNECTION_STRING
-        conn = psycopg2.connect(conn_string)
-        cursor = conn.cursor()
-        cursor.execute("DROP TABLE votes, comments, answers, questions, revoked_tokens, users")
-        conn.commit()
-        conn.close()
