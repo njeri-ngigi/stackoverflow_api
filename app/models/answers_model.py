@@ -69,7 +69,7 @@ class AnswersModel(BaseModel):
                     u_name = self.cursor.fetchone()[0]
                     if username == u_name:
                         sql = "UPDATE answers SET accepted = (%s) WHERE"
-                        self.cursor.execute(sql + " accepted = (%s);", (0, 1,))
+                        self.cursor.execute(sql + " accepted = (%s) AND q_id=(%s);", (0, 1,question_id,))
                         self.cursor.execute(sql + " answer_id = (%s);", (1, answer_id,))
                         self.cursor.execute("UPDATE questions SET q_accepted_answer = (%s) WHERE question_id = (%s);", (answer_id, question_id,))
                         self.conn.commit()

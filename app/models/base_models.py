@@ -32,7 +32,7 @@ class BaseModel(object):
         '''get a page of results'''
         num = 5
         end = num * page
-        start = end - 5
+        start = end - num
         if start < 0:
             start = 0
         return my_list[start:end]

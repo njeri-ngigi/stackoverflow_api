@@ -49,6 +49,9 @@ class Login(Resource):
         password = data.get("password")
         if not username or not password:
             return dict(message="Username or password fields missing"), 400
+        result = validate.check_for_white_spaces([username, password])
+        if result:
+            return result, 400
         my_user = User()
         result = my_user.login(username, password)
         if "error" in result:

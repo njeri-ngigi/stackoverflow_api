@@ -26,7 +26,7 @@ class QuestionsModel(BaseModel):
 
     def get_all_questions(self, limit=None, pages=None, most_answers=None):
         '''get all questions'''
-        sql = "SELECT * FROM questions"
+        sql = "SELECT * FROM questions ORDER BY question_id DESC"
         if most_answers:
             sql = "SELECT * FROM questions ORDER BY q_answers DESC"
         self.cursor.execute(sql)
@@ -38,15 +38,30 @@ class QuestionsModel(BaseModel):
             result = self.paginate(result, pages)
         self.conn.close()
         return result
+    
+    def fetch_answers(self, all_answers):
+        answers = []
+        for i in all_answers:
+            answer = {"id":i[0], "username":i[3], "content":i[2], "upvotes":i[5], "downvotes":i[6]}
+            if i[4] == 1:
+                answer["accepted"] = "true"
+            answers.append(answer)
+        return answers
 
-    def get_single_question(self, question_id):
+    def get_single_question(self, question_id, username=None):
         '''get single question'''
         self.cursor.execute("SELECT * FROM questions WHERE question_id = (%s);", (question_id,))
         result = self.cursor.fetchone()
-        self.conn.close()
         if not result:
+            self.conn.close()
             return dict(response=dict(message="Question doesn't exist"), status_code=404)
-        return dict(response=dict(title=result[1], content=result[2], username=result[3]), status_code=200)
+        sql = "SELECT * FROM answers WHERE q_id = (%s) ORDER BY accepted DESC"
+        self.cursor.execute(sql, (question_id,))
+        result2 = self.cursor.fetchall()
+        answers = self.fetch_answers(result2)
+        if not username:
+            self.conn.close()
+        return dict(response=dict(title=result[1], content=result[2], username=result[3], answers=answers), status_code=200)
 
     def delete_question(self, question_id, username):
         '''Delete question'''
@@ -70,7 +85,7 @@ class QuestionsModel(BaseModel):
 
     def get_all_user_questions(self, username, limit=None, pages=None):
         '''get all questions a user has ever asked'''
-        self.cursor.execute("SELECT * FROM questions WHERE q_username = (%s);", (username,))
+        self.cursor.execute("SELECT * FROM questions WHERE q_username = (%s) ORDER BY question_id DESC;", (username,))
         if limit:
             result = self.cursor.fetchmany(limit)
         if not limit:
@@ -79,6 +94,19 @@ class QuestionsModel(BaseModel):
             result = self.paginate(result, pages)
         self.conn.close()
         return result
+    
+    def get_all_user_answers(self, username):
+        '''get all answers a user has ever given'''
+        self.cursor.execute("SELECT q_id FROM answers WHERE a_username = (%s)", (username,))
+        questions = set(list(chain.from_iterable(self.cursor.fetchall())))
+        answers = []
+        for i in questions:
+            result = self.get_single_question(i, True)
+            if result["status_code"] != 200:
+                return result
+            answers.append(result["response"]) 
+        self.conn.close()
+        return dict(answers=answers)
 
     def search_question(self, title, limit):
         '''search question by title'''
