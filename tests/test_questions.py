@@ -218,7 +218,4 @@ class TestQuestions(BaseTest):
         my_data = json.loads(result.data)
         self.assertEqual(result.status_code, 200)
         self.assertGreaterEqual(len(my_data), 0)
-
-        #test user not logged in
-
         
