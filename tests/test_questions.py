@@ -187,8 +187,8 @@ class TestQuestions(BaseTest):
                                      content_type="application/json",
                                      data=json.dumps({"content":"just in time"}))
         my_data4 = json.loads(result4.data)
-        self.assertEqual(result4.status_code, 404)
-        self.assertEqual("No matches. Be the first to ask the question?", my_data4["message"])
+        self.assertEqual(result4.status_code, 200)
+        self.assertEqual(len(my_data4), 0)
         #test whitespaces
         result5 = self.client().post('/api/v1/questions/search?limit=10',
                                      content_type="application/json",
