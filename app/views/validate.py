@@ -26,7 +26,6 @@ class Validate(object):
             error["message"] = "password must contain atleast one numeric or special character"
         if len(password) < 6:
             error["message"] = "password is too short. Minimum length is 6 characters."
-        
         if "message" in error:
             return error
         return password
@@ -43,12 +42,14 @@ class Validate(object):
             i = i.strip()
             if not i:
                 return {"message": "Enter valid data. Look out for whitespaces in field(s)."}
-    
+
     def check_for_data(self, data):
+        '''method checking for data'''
         if not data:
             return dict(message="Field(s) cannot be empty")
 
     def check_for_content(self, content):
+        '''checking for content'''
         message = ""
         message = "Content field missing"
         if len(content) > 1:
@@ -68,7 +69,7 @@ class Validate(object):
         name = self.validate_name(name)
         my_list2 = [result, email, password, name]
         for i in my_list2:
-            if type(i) == dict:
+            if isinstance(i, dict):
                 if "message" in i:
                     return i
         return {"username":username, "name":name, "password":password, "email":email}

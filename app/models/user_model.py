@@ -1,6 +1,5 @@
 '''app/models.user_model.py'''
 from werkzeug.security import generate_password_hash, check_password_hash
-import psycopg2
 from app.models.base_models import BaseModel
 
 class User(BaseModel):

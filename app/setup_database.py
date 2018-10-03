@@ -10,8 +10,9 @@ class SetupDB(object):
         self.db_connection = psycopg2.connect(connection_string)
         #create a psycopg2 cursor
         self.cursor = self.db_connection.cursor()
-    
+
     def create_db(self):
+        '''method creating tables'''
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS questions(
                 question_id          SERIAL PRIMARY KEY,
                 q_title              VARCHAR(50)  NOT NULL,

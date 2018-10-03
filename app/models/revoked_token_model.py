@@ -1,5 +1,4 @@
 '''app/models/revoked_token_model.py'''
-import psycopg2
 from app.models.base_models import BaseModel
 
 class RevokedTokens(BaseModel):

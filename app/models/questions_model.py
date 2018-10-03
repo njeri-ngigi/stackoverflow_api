@@ -1,7 +1,6 @@
 '''app/models/questions_model.py'''
 from difflib import get_close_matches
 from itertools import chain
-import psycopg2
 from app.models.base_models import BaseModel
 
 class QuestionsModel(BaseModel):
@@ -12,7 +11,7 @@ class QuestionsModel(BaseModel):
         result = self.cursor.fetchone()
         if result:
             my_resp = dict(message="Question has already been asked. Visit question #" +
-                        str(result[0]), question_id=result[0])
+                           str(result[0]), question_id=result[0])
             return dict(response=my_resp, status_code=409)
         sql = """INSERT INTO questions(q_title, q_content, q_username)
                  VALUES(%s, %s, %s) RETURNING question_id;"""
@@ -38,8 +37,9 @@ class QuestionsModel(BaseModel):
             result = self.paginate(result, pages)
         self.conn.close()
         return result
-    
+
     def fetch_answers(self, all_answers):
+        '''helper method to fetch ansers'''
         answers = []
         for i in all_answers:
             answer = {"id":i[0], "username":i[3], "content":i[2], "upvotes":i[5], "downvotes":i[6]}
@@ -94,7 +94,7 @@ class QuestionsModel(BaseModel):
             result = self.paginate(result, pages)
         self.conn.close()
         return result
-    
+
     def get_all_user_answers(self, username):
         '''get all answers a user has ever given'''
         self.cursor.execute("SELECT q_id FROM answers WHERE a_username = (%s)", (username,))
@@ -106,7 +106,7 @@ class QuestionsModel(BaseModel):
             result = self.get_single_question(i, True)
             if result["status_code"] != 200:
                 return result
-            answers.append(result["response"]) 
+            answers.append(result["response"])
         self.conn.close()
         return dict(answers=answers, count=all_user_answers)
 
