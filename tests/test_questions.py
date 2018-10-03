@@ -210,3 +210,15 @@ class TestQuestions(BaseTest):
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
         self.assertEqual("Content field missing", my_data7["message"])
+
+    def test_user_answers(self):
+        #test successful fetch
+        result = self.client().get('/api/v1/users/answers',
+                                    headers=dict(Authorization="Bearer " + self.a_token2))
+        my_data = json.loads(result.data)
+        self.assertEqual(result.status_code, 200)
+        self.assertGreaterEqual(len(my_data), 0)
+
+        #test user not logged in
+
+        
