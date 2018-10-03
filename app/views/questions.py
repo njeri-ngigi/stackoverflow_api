@@ -110,7 +110,7 @@ class QuestionsAnswers(Resource):
             return dict(message=result["message"]), result["error"]
         all_answers = []
         for i in result:
-            answer = {"username":i[3], "content":i[2], "upvotes":i[5], "downvotes":i[6]}
+            answer = {"id":i[0], "username":i[3], "content":i[2], "upvotes":i[5], "downvotes":i[6]}
             if i[4] == 1:
                 answer["accepted"] = "true"
             all_answers.append(answer)
@@ -177,9 +177,19 @@ class UserQuestions(Resource):
         result = my_question.get_all_user_questions(username, limit, pages)
         all_questions = []
         for i in result:
-            question = {"question_id": i[0], "title": i[1], "content": i[2], "answers": i[4]}
+            question = {"question_id": i[0], "title": i[1], "content": i[2], "answers": i[5]}
             all_questions.append(question)
         return all_questions, 200
+
+class UserAnswers(Resource):
+    '''class representing get all user answers'''
+    @classmethod
+    @jwt_required
+    def get(cls):
+        '''get all user's answers'''
+        username = get_jwt_identity()
+        my_question = QuestionsModel()
+        return my_question.get_all_user_answers(username)
 
 class SearchQuestion(Resource):
     '''class representing search question'''
