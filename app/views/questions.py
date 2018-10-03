@@ -25,7 +25,7 @@ class Questions(Resource):
             pages = ast.literal_eval(pages)
         my_question = QuestionsModel()
         if query == "most_answers":
-            result = my_question.get_all_questions(limit,  pages, most_answers=True)
+            result = my_question.get_all_questions(limit, pages, most_answers=True)
         else:
             result = my_question.get_all_questions(limit, pages)
         all_questions = []
@@ -45,7 +45,7 @@ class Questions(Resource):
             content = data.get("content")
             result = validate.check_for_content([title, content])
             if not result:
-                result = validate.check_for_white_spaces([title, content])        
+                result = validate.check_for_white_spaces([title, content])
                 if not result:
                     username = get_jwt_identity()
                     my_question = QuestionsModel()

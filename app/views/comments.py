@@ -1,3 +1,4 @@
+'''app/views/comments.py'''
 import ast
 from flask_restful import Resource
 from flask import request
@@ -61,12 +62,12 @@ class AnswerCommentsId(Resource):
         username = get_jwt_identity()
         data = request.get_json()
         result = validate.check_for_data(data)
-        if not result:            
+        if not result:
             content = data.get("content")
             result = validate.check_for_content([content])
             if not result:
                 result = validate.check_for_white_spaces([content])
-                if not result:            
+                if not result:
                     my_answer = AnswersModel()
                     result2 = my_answer.update_comment(q_id, a_id, c_id, username, content)
                     return result2["response"], result2["status_code"]

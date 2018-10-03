@@ -1,3 +1,4 @@
+'''app/models/base_models.py'''
 import os
 import psycopg2
 from instance.config import app_config
@@ -27,7 +28,7 @@ class BaseModel(object):
         if not result:
             return dict(response=dict(message="This answer doesn't exist"), status_code=404)
         return result
-    
+
     def paginate(self, my_list, page):
         '''get a page of results'''
         num = 5
