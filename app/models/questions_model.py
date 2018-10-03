@@ -61,7 +61,7 @@ class QuestionsModel(BaseModel):
         answers = self.fetch_answers(result2)
         if not username:
             self.conn.close()
-        return dict(response=dict(title=result[1], content=result[2], username=result[3], answers=answers), status_code=200)
+        return dict(response=dict(id=result[0], title=result[1], content=result[2], username=result[3], answers_count=len(result2), answers=answers), status_code=200)
 
     def delete_question(self, question_id, username):
         '''Delete question'''
@@ -98,7 +98,9 @@ class QuestionsModel(BaseModel):
     def get_all_user_answers(self, username):
         '''get all answers a user has ever given'''
         self.cursor.execute("SELECT q_id FROM answers WHERE a_username = (%s)", (username,))
-        questions = set(list(chain.from_iterable(self.cursor.fetchall())))
+        result = list(chain.from_iterable(self.cursor.fetchall()))
+        all_user_answers = len(result)
+        questions = set(result)
         answers = []
         for i in questions:
             result = self.get_single_question(i, True)
@@ -106,20 +108,17 @@ class QuestionsModel(BaseModel):
                 return result
             answers.append(result["response"]) 
         self.conn.close()
-        return dict(answers=answers)
+        return dict(answers=answers, count=all_user_answers)
 
     def search_question(self, title, limit):
         '''search question by title'''
         self.cursor.execute("SELECT question_id, q_title FROM questions WHERE q_title = (%s);", (title,))
         result = self.cursor.fetchone()
         if result:
-            self.conn.close()
-            return dict(response=dict(question_id=result[0], title=result[1]), status_code=200)
+            return self.get_single_question(result[0])
         self.cursor.execute("SELECT q_title FROM questions")
         result = self.cursor.fetchmany(limit)
         flattened_list = list(chain.from_iterable(result))
         search_result = get_close_matches(title, flattened_list, n=15)
         self.conn.close()
-        if not search_result:
-            return dict(response=dict(message="No matches. Be the first to ask the question?"), status_code=404)
         return dict(response=search_result, status_code=200)
