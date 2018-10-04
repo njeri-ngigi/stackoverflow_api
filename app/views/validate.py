@@ -30,10 +30,22 @@ class Validate(object):
             return error
         return password
 
+    def validate_username(self, username):
+        #search for only numbers and special characters
+        if len(username) < 4:
+            return {"message": "Username should be 4 or more characters"}
+        if username.isdigit():
+            return {"message": "Username cannot contain only numbers"}
+        if bool(re.search(r'[^a-zA-Z0-9_]', username)):
+            return {"message": "Username cannot contain special characters"}
+        return username
+
     def validate_name(self, name):
         '''method to check for special characters in name'''
         if bool(re.search(self.special_character_regex, name)) is True:
             return {"message":"Name cannot contain special characters and numbers"}
+        if len(name) < 4:
+            return {"message":"Name should be 4 or more characters"}
         return name
 
     def check_for_white_spaces(self, my_list):
@@ -67,7 +79,8 @@ class Validate(object):
         email = self.validate_email(email)
         password = self.validate_password(password, confirm_password)
         name = self.validate_name(name)
-        my_list2 = [result, email, password, name]
+        username = self.validate_username(username)
+        my_list2 = [result, email, password, name, username]
         for i in my_list2:
             if isinstance(i, dict):
                 if "message" in i:

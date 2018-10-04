@@ -118,6 +118,42 @@ class RegisterUserTestCase(BaseTest):
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
         self.assertEqual("Enter valid data. Look out for whitespaces in field(s).", my_data7["message"])
+        #test for short name
+        result8 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "A", "username": "sweetstuff",
+                                                      "email": "sweetstuff@to.cm", "password": "Test123",
+                                                      "confirm_password": "Test123"}))
+        my_data8 = json.loads(result8.data)
+        self.assertEqual(result8.status_code, 400)
+        self.assertEqual("Name should be 4 or more characters", my_data8["message"])
+        #test for short username
+        result9 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "Alice", "username": "a",
+                                                      "email": "alice@to.cm", "password": "Test123",
+                                                      "confirm_password": "Test123"}))
+        my_data9 = json.loads(result9.data)
+        self.assertEqual(result9.status_code, 400)
+        self.assertEqual("Username should be 4 or more characters", my_data9["message"])
+        #test for only numbers in username
+        result10 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "Bobby", "username": "12345",
+                                                      "email": "sweetstuff@to.cm", "password": "Test123",
+                                                      "confirm_password": "Test123"}))
+        my_data10 = json.loads(result10.data)
+        self.assertEqual(result10.status_code, 400)
+        self.assertEqual("Username cannot contain only numbers", my_data10["message"])
+        #test for only numbers in username
+        result11 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "Bobby", "username": "bo-b!*",
+                                                      "email": "sweetstuff@to.cm", "password": "Test123",
+                                                      "confirm_password": "Test123"}))
+        my_data11 = json.loads(result11.data)
+        self.assertEqual(result11.status_code, 400)
+        self.assertEqual("Username cannot contain special characters", my_data11["message"])
 
     def test_login_logout(self):
         '''Test user login and logout'''
