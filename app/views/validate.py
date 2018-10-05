@@ -34,6 +34,8 @@ class Validate(object):
         #search for only numbers and special characters
         if len(username) < 4:
             return {"message": "Username should be 4 or more characters"}
+        if len(username) > 29:
+            return {"message": "Username is too long. Try one between 4 & 29 characters"}
         if username.isdigit():
             return {"message": "Username cannot contain only numbers"}
         if bool(re.search(r'[^a-zA-Z0-9_]', username)):
@@ -60,12 +62,18 @@ class Validate(object):
         if not data:
             return dict(message="Field(s) cannot be empty")
 
+    def check_for_length(self, title):
+        '''method checking for length of title'''
+        if len(title) > 49:
+            return dict(message="Title is too long. Please shorten it.")
+
     def check_for_content(self, content):
         '''checking for content'''
         message = ""
-        message = "Content field missing"
+        message = "Please enter content"
         if len(content) > 1:
-            message = "Title or Content fields missing"
+            if not content[0]:
+                message = "Please enter title"
         for i in content:
             if not i:
                 return dict(message=message)
@@ -80,7 +88,7 @@ class Validate(object):
         password = self.validate_password(password, confirm_password)
         name = self.validate_name(name)
         username = self.validate_username(username)
-        my_list2 = [result, email, password, name, username]
+        my_list2 = [result, name, username, email, password]
         for i in my_list2:
             if isinstance(i, dict):
                 if "message" in i:

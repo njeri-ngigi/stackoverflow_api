@@ -23,9 +23,19 @@ class Signup(Resource):
         email = data.get("email")
         password = data.get("password")
         confirm_password = data.get("confirm_password")
-        if not username or not name or not email or not password or not confirm_password:
-            return dict(
-                message="name, username, email, password or confirm_password fields missing"), 400
+        message = ""
+        if not confirm_password:
+            message = "Please Re-enter password"
+        if not password:
+            message = "Please enter password"
+        if not email:
+            message = "Please enter email"
+        if not username:
+            message = "Please enter username"
+        if not name:
+            message = "Please enter name"
+        if message:
+            return dict(message=message), 400
         passwords = [password, confirm_password]
         result = validate.validate_register(username, name, email, passwords)
         if "message" in result:
@@ -47,8 +57,13 @@ class Login(Resource):
             return result, 400
         username = data.get("username")
         password = data.get("password")
-        if not username or not password:
-            return dict(message="Username or password fields missing"), 400
+        message = ""
+        if not password:
+            message = "Please enter password"
+        if not username:
+            message = "Please enter username"
+        if message:
+            return dict(message=message), 400
         result = validate.check_for_white_spaces([username, password])
         if result:
             return result, 400

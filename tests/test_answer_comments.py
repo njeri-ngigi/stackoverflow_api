@@ -37,7 +37,7 @@ class TestQuestionAnswers(BaseTest):
                                      data=json.dumps({"content": ""}))
         my_data4 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 400)
-        self.assertEqual("Content field missing", my_data4["message"])
+        self.assertEqual("Please enter content", my_data4["message"])
         #test whitespaces
         result5 = self.client().post('/api/v1/questions/1/answers/1/comments',
                                      headers=dict(Authorization="Bearer " + self.a_token3),
@@ -169,7 +169,7 @@ class TestQuestionAnswers(BaseTest):
                                     data=json.dumps({"content": ""}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
-        self.assertEqual("Content field missing", my_data7["message"])
+        self.assertEqual("Please enter content", my_data7["message"])
         #test whitespaces
         result8 = self.client().put('/api/v1/questions/1/answers/1/comments/1',
                                     headers=dict(Authorization="Bearer " + self.a_token3),

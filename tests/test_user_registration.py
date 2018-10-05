@@ -42,14 +42,42 @@ class RegisterUserTestCase(BaseTest):
         my_data3 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 400)
         self.assertEqual("Field(s) cannot be empty", my_data3["message"])
-        #test missing data fields
+        #test missing name
         result5 = self.client().post('/api/v1/auth/signup',
                                      content_type="application/json",
-                                     data=json.dumps({"name": "Njeri", "username": "njery"}))
+                                     data=json.dumps({"name": ""}))
         my_data5 = json.loads(result5.data)
         self.assertEqual(result5.status_code, 400)
-        self.assertEqual("name, username, email, password or confirm_password fields missing",
-                         my_data5["message"])
+        self.assertEqual("Please enter name", my_data5["message"])
+        #test missing username
+        result6 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "Njeri", "username":""}))
+        my_data6 = json.loads(result6.data)
+        self.assertEqual(result6.status_code, 400)
+        self.assertEqual("Please enter username",my_data6["message"])
+        #test missing email
+        result7 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "Njeri", "username":"njery", "email":""}))
+        my_data7 = json.loads(result7.data)
+        self.assertEqual(result7.status_code, 400)
+        self.assertEqual("Please enter email",my_data7["message"])
+        #test missing password
+        result8 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "Njeri", "username":"njery", "email":"nje@g.com", "password":""}))
+        my_data8 = json.loads(result8.data)
+        self.assertEqual(result8.status_code, 400)
+        self.assertEqual("Please enter password",my_data8["message"])
+        #test missing confirm_password
+        result9 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "Njeri", "username":"njery", "email":"nje@g.com", "password":"Test123", "confirm_password":""}))
+        my_data9 = json.loads(result9.data)
+        self.assertEqual(result9.status_code, 400)
+        self.assertEqual("Please Re-enter password",my_data9["message"])
+
 
     def test_validate_data(self):
         '''Test validating user input'''
@@ -154,6 +182,15 @@ class RegisterUserTestCase(BaseTest):
         my_data11 = json.loads(result11.data)
         self.assertEqual(result11.status_code, 400)
         self.assertEqual("Username cannot contain special characters", my_data11["message"])
+        #test for very long username
+        result12 = self.client().post('/api/v1/auth/signup',
+                                     content_type="application/json",
+                                     data=json.dumps({"name": "Bobby", "username": "wekrbekfdfjkbvdkvbjhdfbviofjpojdfkbdhjfidhfjfdkhjfbiuo",
+                                                      "email": "sweetstuff@to.cm", "password": "Test123",
+                                                      "confirm_password": "Test123"}))
+        my_data12 = json.loads(result12.data)
+        self.assertEqual(result12.status_code, 400)
+        self.assertEqual("Username is too long. Try one between 4 & 29 characters", my_data12["message"])
 
     def test_login_logout(self):
         '''Test user login and logout'''
@@ -203,10 +240,17 @@ class RegisterUserTestCase(BaseTest):
         my_data6 = json.loads(result6.data)
         self.assertEqual(result6.status_code, 400)
         self.assertEqual("Field(s) cannot be empty", my_data6["message"])
-        #test empty content
+        #test empty username
         result7 = self.client().post('/api/v1/auth/login',
                                     content_type="application/json",
-                                    data=json.dumps({"username":"", "password":""}))
+                                    data=json.dumps({"username":"", "password":"Test123"}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
-        self.assertEqual("Username or password fields missing", my_data7["message"])
+        self.assertEqual("Please enter username", my_data7["message"])
+        #test empty password
+        result8 = self.client().post('/api/v1/auth/login',
+                                    content_type="application/json",
+                                    data=json.dumps({"username":"bobby", "password":""}))
+        my_data8 = json.loads(result8.data)
+        self.assertEqual(result8.status_code, 400)
+        self.assertEqual("Please enter password", my_data8["message"])
