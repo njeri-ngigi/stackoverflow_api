@@ -54,7 +54,7 @@ class TestQuestionAnswers(BaseTest):
                                      data=json.dumps({"content": ""}))
         my_data6 = json.loads(result6.data)
         self.assertEqual(result6.status_code, 400)
-        self.assertEqual("Content field missing", my_data6["message"])
+        self.assertEqual("Please enter content", my_data6["message"])
 
     def test_get_all_question_answers(self):
         '''test handling getting all answers to a question'''

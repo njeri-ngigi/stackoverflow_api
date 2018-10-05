@@ -47,10 +47,12 @@ class Questions(Resource):
             if not result:
                 result = validate.check_for_white_spaces([title, content])
                 if not result:
-                    username = get_jwt_identity()
-                    my_question = QuestionsModel()
-                    result2 = my_question.post_question(title, content, username)
-                    return result2["response"], result2["status_code"]
+                    result = validate.check_for_length(title)
+                    if not result:
+                        username = get_jwt_identity()
+                        my_question = QuestionsModel()
+                        result2 = my_question.post_question(title, content, username)
+                        return result2["response"], result2["status_code"]
         return result, 400
 
 class QuestionsQuestionId(Resource):

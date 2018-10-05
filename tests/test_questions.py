@@ -42,15 +42,32 @@ class TestQuestions(BaseTest):
         my_data4 = json.loads(result4.data)
         self.assertEqual(result4.status_code, 400)
         self.assertEqual("Field(s) cannot be empty", my_data4["message"])
-        #test for missing content and title
+        #test for missing title
         result5 = self.client().post('/api/v1/questions',
                                      headers=dict(Authorization="Bearer " + self.a_token),
                                      content_type="application/json",
-                                     data=json.dumps({"title": "",
-                                                      "content": ""}))
+                                     data=json.dumps({"title": ""}))
         my_data5 = json.loads(result5.data)
         self.assertEqual(result5.status_code, 400)
-        self.assertEqual("Title or Content fields missing", my_data5["message"])
+        self.assertEqual("Please enter title", my_data5["message"])
+        #test for missing content
+        result6 = self.client().post('/api/v1/questions',
+                                     headers=dict(Authorization="Bearer " + self.a_token),
+                                     content_type="application/json",
+                                     data=json.dumps({"title": "Jojo",
+                                                      "content": ""}))
+        my_data6 = json.loads(result6.data)
+        self.assertEqual(result6.status_code, 400)
+        self.assertEqual("Please enter content", my_data6["message"])
+        #test for very long title
+        result7 = self.client().post('/api/v1/questions',
+                                     headers=dict(Authorization="Bearer " + self.a_token),
+                                     content_type="application/json",
+                                     data=json.dumps({"title": "Kjkkjdfnlfjdflknfjvjfdjp[kdfjdfdsfdvvkknvnvjjfvfjvlfvfvjifjvpfjvafivlkfnvlnviufhaffgkfnjhfuvhpiadfgufgpkgafjnhfvygv",
+                                                      "content": "dede"}))
+        my_data7 = json.loads(result7.data)
+        self.assertEqual(result7.status_code, 400)
+        self.assertEqual("Title is too long. Please shorten it.", my_data7["message"])
 
     def test_get_questions(self):
         '''test getting all questions and single questions'''
@@ -209,7 +226,7 @@ class TestQuestions(BaseTest):
                                      data=json.dumps({"content":""}))
         my_data7 = json.loads(result7.data)
         self.assertEqual(result7.status_code, 400)
-        self.assertEqual("Content field missing", my_data7["message"])
+        self.assertEqual("Please enter content", my_data7["message"])
 
     def test_user_answers(self):
         #test successful fetch

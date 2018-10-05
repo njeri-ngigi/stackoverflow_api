@@ -15,7 +15,7 @@ class TestingConfig(Config):
     '''configurations for testing with a separate test database'''
     TESTING = True
     DEBUG = True
-    CONNECTION_STRING = "dbname='test_db' user='postgres' host='localhost' password='testme'"
+    CONNECTION_STRING = "dbname='test_db' user='postgres' host='localhost'"
     SECRET_KEY = 'KjkhFDjihkgy#$&(hdsdsddR#$gdd!'
 
 class ProductionConfig(Config):
