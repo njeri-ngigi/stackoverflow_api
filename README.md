@@ -82,7 +82,7 @@ The app is hosted on heroku<br>
 [Go to Stackoverflow-lite](https://my-stackoverflow-lite-api.herokuapp.com/)
 
 ## Built with 
-   Flask, a python framework
+   Flask, a python framework.
    
 ## Authors
 [Njeri Ngigi](https://github.com/njeri-ngigi)
